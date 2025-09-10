@@ -1,0 +1,1864 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard WMS Multifuncional</title>
+    <!-- Bibliotecas para processamento de dados e relatórios -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- BIBLIOTECAS PDF ATUALIZADAS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.autotable.min.js"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+        :root {
+            --primary-color: #0d6efd;
+            --primary-light: #e7f1ff;
+            --secondary-color: #6c757d;
+            --sector-primary: #6f42c1;
+            --sector-light: #f1ecf9;
+            --product-primary: #fd7e14;
+            --product-light: #fff2e7;
+            --success-color: #198754;
+            --warning-color: #ffc107;
+            --warning-light: #fffcf1;
+            --warning-dark: #664d03;
+            --error-color: #dc3545;
+            --background-color: #f0f2f5; /* Fundo mais suave */
+            --card-background: #ffffff;
+            --text-color: #343a40;
+            --text-light: #6c757d;
+            --border-color: #dee2e6;
+            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1); /* Sombra mais moderna */
+            --border-radius: 0.75rem;
+        }
+
+        /* === ESTILOS BASE (MOBILE-FIRST) === */
+        body {
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        /* === NOVO CABEÇALHO === */
+        .main-header {
+            background-color: var(--card-background);
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .header-content {
+            max-width: 1600px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .main-header h1 {
+            font-size: 1.5em;
+            font-weight: 600;
+            color: var(--text-color);
+            margin: 0;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1600px; /* Limita a largura máxima em telas grandes */
+            margin: 0 auto; /* Centraliza o container */
+            padding: 1rem;
+            box-sizing: border-box;
+        }
+
+        .content-section {
+            background-color: var(--card-background);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow);
+        }
+
+        /* === TÍTULOS MODERNIZADOS === */
+        h2 {
+            border-bottom: 1px solid var(--border-color); /* Linha fina */
+            padding-bottom: 0.75rem;
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+            font-size: 1.4em;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        /* Ícones coloridos nos títulos */
+        #validation-section h2 { color: var(--primary-color); }
+        #sector-section h2, #label-section h2, #filial-section h2 { color: var(--sector-primary); }
+        #product-section h2 { color: var(--product-primary); }
+        #no-billing-section h2 { color: var(--error-color); }
+
+
+        .file-inputs-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; }
+        .file-drop-area { display: flex; flex-direction: column; align-items: center; justify-content: center; border: 2px dashed var(--border-color); padding: 1.5rem; border-radius: var(--border-radius); width: 100%; box-sizing: border-box; background-color: #fcfdff; cursor: pointer; transition: border-color 0.3s, background-color 0.3s; text-align: center; height: 100%; }
+        .file-drop-area.dragover { border-color: var(--primary-color); background-color: var(--primary-light); }
+        .file-drop-area p { margin: 0.5rem 0 0; color: var(--text-light); font-weight: 500; font-size: 0.9em; }
+        .file-drop-area input[type="file"] { display: none; }
+        .file-drop-area.loaded { border-color: var(--success-color); background-color: #f0fff8; }
+
+        .actions-container {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            padding: 0;
+        }
+
+        .action-btn {
+            padding: 0.85rem 1rem;
+            font-size: 1em;
+            font-weight: 600;
+            border: 1px solid var(--border-color);
+            background-color: var(--card-background);
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        #reload-files-btn { color: var(--primary-color); }
+        #reload-files-btn:hover { background-color: var(--primary-light); border-color: var(--primary-color); transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.1);}
+        #export-data-btn { color: var(--sector-primary); }
+        #export-data-btn:hover { background-color: var(--sector-light); border-color: var(--sector-primary); transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.1);}
+        #daily-report-btn { color: #fff; background-color: var(--success-color); border-color: var(--success-color); }
+        #daily-report-btn:hover { opacity: 0.85; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.1);}
+        #share-online-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.1);}
+
+        .filter-container, .search-container { background-color: var(--background-color); padding: 1rem; border-radius: var(--border-radius); margin-bottom: 1.5rem; display: flex; flex-direction: column; align-items: stretch; gap: 1rem; border: 1px solid #e9ecef; position: relative; }
+        .filter-container label { font-weight: 600; color: var(--text-color); font-size: 0.9em; flex-shrink: 0; }
+        .filter-container select, .filter-container input, .search-container input { padding: 0.75rem 1rem; border-radius: 0.5rem; border: 1px solid var(--border-color); font-size: 1em; width: 100%; box-sizing: border-box; background-color: #fff; font-family: 'Poppins', sans-serif; transition: box-shadow 0.2s, border-color 0.2s; }
+        .filter-container select:focus, .filter-container input:focus, .search-container input:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px var(--primary-light); }
+
+        .table-responsive-wrapper { width: 100%; overflow-x: auto; margin-bottom: 2rem; }
+        
+        table { width: 100%; border-collapse: collapse; background: #fff; border-radius: var(--border-radius); overflow: hidden; box-shadow: var(--shadow); }
+        
+        th, td {
+            padding: 0.5rem 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #f1f3f5;
+            white-space: nowrap;
+            font-size: 0.8em;
+            vertical-align: middle;
+        }
+
+        thead {
+            background-color: #f8f9fa;
+            color: var(--text-light);
+            font-weight: 600;
+            font-size: 0.75em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        tbody tr:nth-child(even):not(.product-details-row) { background-color: #f8f9fa; }
+        tbody tr:not(.product-details-row):hover { background-color: var(--primary-light); }
+
+        .hidden { display: none !important; }
+
+        #last-updated-container { text-align: center; margin-bottom: 1rem; font-size: 0.8em; color: var(--text-light); display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; }
+
+        .summary-card { padding: 1rem; border-radius: var(--border-radius); margin-bottom: 1.5rem; border-left: 5px solid; box-shadow: var(--shadow); }
+        #validation-section .summary-card { background-color: var(--primary-light); border-color: var(--primary-color); color: var(--primary-color); }
+        #sector-section .summary-card, #filial-section .summary-card { background-color: var(--sector-light); border-color: var(--sector-primary); color: var(--sector-primary); }
+        #product-section .summary-card { background-color: var(--product-light); border-color: var(--product-primary); color: var(--product-primary); }
+        #no-billing-section .summary-card { background-color: #f8d7da; border-color: var(--error-color); color: #721c24; }
+        
+        .summary-card h2 { margin-top: 0; font-size: 1.1em; background: none; box-shadow: none; padding: 0; color: inherit; border: none; font-weight: 500; }
+        .summary-card p { font-size: 1.3em; font-weight: 700; margin: 0.5rem 0 0; }
+        .summary-card .address-info { font-size: 0.9em; font-weight: 500; opacity: 0.9; }
+
+        .geral-summary-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; margin-bottom: 2rem; }
+        .geral-summary-card { background-color: var(--card-background); padding: 1.5rem; border-radius: var(--border-radius); box-shadow: var(--shadow); display: flex; align-items: center; gap: 0.75rem; border: 1px solid #e9ecef; flex-direction: column; text-align: center; }
+        .geral-summary-card .icon { font-size: 2em; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
+        .geral-summary-card .icon.unidades { background-color: var(--primary-light); color: var(--primary-color); }
+        .geral-summary-card .icon.skus { background-color: var(--product-light); color: var(--product-primary); }
+        .geral-summary-card .icon.sector { background-color: var(--sector-light); color: var(--sector-primary); }
+        .geral-summary-card .info p { margin: 0; font-size: 0.9em; color: var(--text-light); }
+        .geral-summary-card .info .value { font-size: 1.5em; font-weight: 700; color: var(--text-color); }
+
+        .loader-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(255, 255, 255, 0.85); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 5000; font-size: 1.2em; font-weight: 600; color: var(--primary-color); backdrop-filter: blur(4px); }
+        .loader-spinner { border: 4px solid var(--primary-light); border-top: 4px solid var(--primary-color); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 1rem; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .notification { position: fixed; top: 10px; right: 10px; left: 10px; padding: 1rem; border-radius: 0.5rem; color: #fff; font-weight: 600; z-index: 6000; box-shadow: 0 4px 8px rgba(0,0,0,0.2); transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out; transform: translateY(-200%); opacity: 0; visibility: hidden; text-align: center; }
+        .notification.show { transform: translateY(0); opacity: 1; visibility: visible; }
+        .notification.success { background-color: var(--success-color); }
+        .notification.error { background-color: var(--error-color); }
+        .notification.warning { background-color: var(--warning-color); color: var(--text-color); }
+
+        .placeholder-card { background-color: var(--background-color); border: 2px dashed var(--border-color); border-radius: var(--border-radius); padding: 2rem; text-align: center; margin-top: 1.5rem; color: var(--text-light); }
+        .placeholder-card p { margin: 0; font-weight: 500; font-size: 1em; }
+        .placeholder-card strong { color: var(--text-color); }
+        
+        #file-control-panel { background-color: #fff; border-radius: var(--border-radius); margin-bottom: 1.5rem; overflow: hidden; box-shadow: var(--shadow); }
+        #file-control-header { display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.5rem; cursor: pointer; background-color: #f8f9fa; transition: background-color 0.2s; }
+        #file-control-header:hover { background-color: #f1f3f5; }
+        #file-control-header h3 { margin: 0; font-size: 1.1em; color: var(--text-color); }
+        #file-control-header .toggle-icon { font-size: 1.2em; transition: transform 0.3s ease; }
+        #file-control-panel.open #file-control-header .toggle-icon { transform: rotate(180deg); }
+        #file-control-content { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out; padding: 0 1.5rem; }
+        #file-control-panel.open #file-control-content { max-height: 1000px; padding: 1.5rem; border-top: 1px solid var(--border-color); }
+        #file-control-content h4 { margin-top: 0; margin-bottom: 1rem; font-weight: 600; color: var(--secondary-color); padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-color); }
+        #file-control-content h4:not(:first-child) { margin-top: 1.5rem; }
+
+        .rota-accordion-item { border: 1px solid var(--border-color); border-radius: var(--border-radius); margin-bottom: 0.75rem; overflow: hidden; background-color: var(--card-background); box-shadow: var(--shadow); }
+        .rota-accordion-header { display: flex; justify-content: space-between; align-items: flex-start; padding: 0.75rem 1.25rem; cursor: pointer; background-color: #f8f9fa; transition: background-color 0.2s; border-bottom: 1px solid transparent; flex-direction: column; gap: 0.25rem; position: relative; }
+        .rota-accordion-item.open .rota-accordion-header { border-bottom-color: var(--border-color); }
+        .rota-accordion-header:hover { background-color: #e9ecef; }
+        .rota-accordion-header h2 { margin: 0; font-size: 1.1em; color: var(--primary-color); border: none; padding: 0; padding-right: 2rem; }
+        .rota-accordion-header .rota-summary-info { font-weight: 600; color: var(--text-color); font-size: 0.85em; text-align: left; display: flex; flex-direction: column; gap: 0.25rem; }
+        .rota-accordion-header .rota-summary-info span { margin-left: 0; }
+        .rota-accordion-header .rota-summary-info span:nth-child(2) { display: none; }
+        .rota-accordion-header .toggle-icon-rota { font-size: 1.4em; transition: transform 0.3s ease; font-weight: bold; color: var(--primary-color); position: absolute; top: 0.75rem; right: 1.25rem; }
+        .rota-accordion-item:not(.open) .rota-accordion-header .toggle-icon-rota { transform: rotate(-90deg); }
+        .rota-accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out; }
+        .rota-accordion-item.open .rota-accordion-content { max-height: 2000px; transition: max-height 0.6s ease-in; }
+        .rota-accordion-content .content-wrapper { padding: 1rem; }
+
+        #sector-analysis-table { border: 1px solid var(--border-color); }
+        #sector-analysis-table th { color: var(--sector-primary); }
+        #sector-analysis-table tfoot tr { background-color: var(--sector-light); border-top: 2px solid var(--sector-primary); }
+        #sector-analysis-table tfoot td, 
+        #label-analysis-table tfoot td {
+            font-weight: 700;
+            font-size: 0.9em;
+        }
+        #sector-analysis-table .col-setor { font-weight: 600; width: 40%; }
+        #sector-analysis-table .col-unidades,
+        #sector-analysis-table .col-skus,
+        #sector-analysis-table .col-percent { text-align: right; font-weight: 500; width: 20%; }
+        
+        /* === ESTILOS ATUALIZADOS PARA TABELA DE ETIQUETAS === */
+        #label-analysis-table th:first-child,
+        #label-analysis-table td:first-child {
+            text-align: left;
+            font-weight: 600;
+            position: sticky; /* Trava a primeira coluna */
+            left: 0;
+            background-color: #f8f9fa; /* Fundo para a coluna travada */
+        }
+        #label-analysis-table tbody td:first-child {
+             background-color: var(--card-background);
+        }
+        #label-analysis-table tbody tr:nth-child(even) td:first-child {
+            background-color: #f8f9fa;
+        }
+
+        #label-analysis-table th:not(:first-child),
+        #label-analysis-table td:not(:first-child) { 
+            width: auto; 
+            text-align: right; 
+        }
+        #label-analysis-table tfoot td { color: var(--sector-primary); }
+        #label-analysis-table tfoot td:first-child {
+             background-color: var(--sector-light);
+        }
+
+        .export-btn, .copy-image-btn { display: inline-flex; align-items: center; gap: 8px; padding: 0.6rem 1.2rem; margin-bottom: 1rem; margin-right: 0.5rem; border: 1px solid var(--secondary-color); background-color: var(--secondary-color); color: #fff; border-radius: 0.5rem; cursor: pointer; transition: all 0.2s ease; font-weight: 600; font-size: 0.9em; }
+        .export-btn:hover, .copy-image-btn:hover { opacity: 0.85; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .export-btn.pdf { background-color: #dc3545; border-color: #dc3545; }
+        .export-btn.excel { background-color: #198754; border-color: #198754; }
+        
+        #sector-analysis-table .threat-high { background-color: #f8d7da !important; color: #721c24; }
+        #sector-analysis-table .threat-medium { background-color: #fff3cd !important; color: #856404; }
+        
+        .sector-detail-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; margin-top: 1rem; }
+        .sector-detail-card { background-color: var(--card-background); border: 1px solid var(--border-color); border-radius: var(--border-radius); box-shadow: var(--shadow); overflow: hidden; display: flex; flex-direction: column; }
+        .sector-detail-card-header { margin: 0; padding: 1rem 1.5rem; background-color: #f8f9fa; border-bottom: 1px solid var(--border-color); cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+        .sector-detail-card-header h3 { margin: 0; font-size: 1.1em; color: var(--text-color); }
+        .sector-detail-card .table-wrapper { overflow-y: auto; max-height: 400px; flex-grow: 1; padding: 1rem; }
+        .sector-detail-card-header .toggle-icon-sector { font-size: 1.2em; transition: transform 0.3s ease; font-weight: bold; }
+        .sector-detail-card .sector-detail-content { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out; }
+        .sector-detail-card.open .sector-detail-content { max-height: 2000px; transition: max-height 0.6s ease-in; }
+        .sector-detail-card:not(.open) .sector-detail-card-header .toggle-icon-sector { transform: rotate(-90deg); }
+        .sector-detail-card table { margin-bottom: 0; box-shadow: none; border-radius: 0; }
+        .sector-detail-card table td:nth-child(2), .sector-detail-card table td:nth-child(3) { text-align: right; }
+        .sector-detail-card table tfoot { position: sticky; bottom: 0; }
+
+        #product-view .sector-detail-card-header h3 { color: var(--product-primary); }
+        #product-view table tfoot tr { background-color: var(--product-light); border-top: 2px solid var(--product-primary); }
+        #product-view table tfoot td { color: var(--product-primary); }
+
+        #filial-accordion-container {
+            display: grid;
+            gap: 1rem;
+        }
+        
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); display: flex; justify-content: center; align-items: center; z-index: 4000; padding: 1rem; box-sizing: border-box; }
+        .modal-content { background-color: var(--card-background); padding: 1.5rem; border-radius: var(--border-radius); box-shadow: 0 10px 30px rgba(0,0,0,0.2); width: 100%; max-width: 95%; max-height: 90vh; display: flex; flex-direction: column; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; margin-bottom: 1rem; }
+        .modal-header h3 { font-size: 1.25em; }
+        .modal-close-btn { background: none; border: none; font-size: 2em; cursor: pointer; color: var(--text-light); line-height: 1; }
+        .modal-body { overflow-y: auto; }
+        .modal-footer { border-top: 1px solid var(--border-color); padding-top: 1rem; margin-top: 1rem; display: flex; flex-direction: column; gap: 0.5rem; }
+        
+        #product-search-actions { padding: 1rem; background-color: var(--background-color); border-top: 1px solid var(--border-color); display: flex; flex-direction: column; align-items: stretch; gap: 1rem; }
+        #product-search-actions p { margin: 0; font-weight: 600; text-align: center; }
+        #product-search-actions .action-btn { margin-bottom: 0; }
+
+        .text-right { text-align: right; }
+        td.col-select { width: 1%; padding-right: 0; }
+        th.col-select { width: 1%; padding-right: 0; }
+
+        /* --- ESTILOS RESPONSIVOS (TABLET E DESKTOP) --- */
+        @media (min-width: 768px) {
+            body { padding: 0; }
+            .container { padding: 1.5rem; }
+            .content-section { padding: 1.5rem; margin-bottom: 2rem; }
+            h2 { margin-top: 0; margin-bottom: 1.5rem; font-size: 1.6em; }
+            .actions-container { flex-direction: row; justify-content: center; align-items: center; padding: 1rem 0 0; margin-top: 0; }
+            .action-btn { width: auto; }
+            th, td { font-size: 0.85em; }
+            .geral-summary-grid { grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
+            .geral-summary-card { flex-direction: row; text-align: left; gap: 1.5rem; }
+            .filter-container { flex-direction: row; align-items: center; }
+            .filter-container input, .filter-container select { width: auto; }
+            .rota-accordion-header { flex-direction: row; align-items: center; }
+            .rota-accordion-header h2 { font-size: 1.25em; padding-right: 0; }
+            .rota-accordion-header .rota-summary-info { text-align: right; flex-direction: row; font-size: 0.95em; }
+            .rota-accordion-header .rota-summary-info span { margin-left: 1rem; }
+            .rota-accordion-header .rota-summary-info span:nth-child(2) { display: inline; }
+            .rota-accordion-header .toggle-icon-rota { position: static; }
+
+            #filial-accordion-container {
+                grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            }
+
+            .modal-content { padding: 2.5rem; max-width: 900px; }
+            .modal-header h3 { font-size: 1.5em; }
+            .modal-footer { flex-direction: row; justify-content: flex-end; gap: 1rem; }
+            #product-search-actions { flex-direction: row; align-items: center; gap: 1rem; }
+            #product-search-actions p { text-align: left; }
+        }
+
+        @media (min-width: 1200px) {
+            .sector-detail-grid { grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); }
+        }
+    </style>
+</head>
+<body>
+    <header class="main-header">
+        <div class="header-content">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary-color);">
+                <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"></path>
+                <path d="m3.3 7 8.7 5 8.7-5"></path><path d="M12 22V12"></path>
+                <path d="M17 5.77 7 11.23"></path>
+            </svg>
+            <h1>Dashboard WMS Multifuncional</h1>
+        </div>
+    </header>
+
+    <div id="notification" class="notification"></div>
+
+    <div class="container">
+        <div id="loader" class="loader-overlay hidden"><div class="loader-spinner"></div>A processar...</div>
+
+        <div id="file-control-panel" class="content-section open">
+            <div id="file-control-header">
+                <h3>Painel de Ficheiros</h3>
+                <span class="toggle-icon">▲</span>
+            </div>
+            <div id="file-control-content">
+                <div id="last-updated-container" class="hidden"></div>
+                <h4>Carregar Planilhas</h4>
+                <div class="file-inputs-container">
+                    <label for="ordersFileInput" id="ordersFileInputArea" class="file-drop-area">
+                        <input type="file" id="ordersFileInput" accept=".csv, .xls, .xlsx">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary-color);"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="M12 12v9"/><path d="m16 16-4-4-4 4"/></svg>
+                        <p><strong>Planilha de Pedidos</strong><br>(Resumo WMS Rx ou com Itens)</p>
+                    </label>
+                    <label for="statusFileInput" id="statusFileInputArea" class="file-drop-area">
+                        <input type="file" id="statusFileInput" accept=".csv, .xls, .xlsx">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--warning-dark);"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="m9 12 2 2 4-4"/></svg>
+                        <p><strong>Status de Pedidos (Retorno)</strong><br>(Para Validação)</p>
+                    </label>
+                    <label for="sectorFileInput" id="sectorFileInputArea" class="file-drop-area">
+                        <input type="file" id="sectorFileInput" accept=".csv, .xls, .xlsx">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--sector-primary);"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
+                        <p><strong>Planilha de Itens</strong><br>(Para Análises)</p>
+                    </label>
+                    <label for="addressFileInput" id="addressFileInputArea" class="file-drop-area">
+                        <input type="file" id="addressFileInput" accept=".csv, .xls, .xlsx">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--secondary-color);"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                        <p><strong>Planilha de Endereços</strong><br>(Para Setor e Posição)</p>
+                    </label>
+                    <label for="productMasterFileInput" id="productMasterFileInputArea" class="file-drop-area">
+                        <input type="file" id="productMasterFileInput" accept=".csv, .xls, .xlsx">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--product-primary);"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 8h10"/><path d="M7 12h10"/><path d="M7 16h5"/></svg>
+                        <p><strong>Cadastro de Produtos (QMS)</strong><br>(Para cálculo de Caixas)</p>
+                    </label>
+                </div>
+                <h4 style="margin-top: 2rem;">Carregar Análise Partilhada</h4>
+                <div class="file-inputs-container">
+                    <label for="sharedFileInput" id="sharedFileInputArea" class="file-drop-area">
+                        <input type="file" id="sharedFileInput" accept=".json">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--success-color);"><path d="M16 22h2a2 2 0 0 0 2-2V7l-5-5H6a2 2 0 0 0-2 2v3"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M4 12.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-3z"/><path d="M4 19.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-3z"/><path d="M10 12.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-3z"/><path d="M10 19.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-3z"/></svg>
+                        <p><strong>Importar Relatório Partilhado</strong><br>(Ficheiro .json)</p>
+                    </label>
+                </div>
+                <div id="actions-container" class="actions-container hidden">
+                        <button id="reload-files-btn" class="action-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"></polyline><polyline points="23 20 23 14 17 14"></polyline><path d="M20.49 9A9 9 0 0 0 7.24 4.12M3.51 15A9 9 0 0 0 16.76 19.88"></path></svg>
+                        Limpar e Recomeçar
+                    </button>
+                    <button id="export-data-btn" class="action-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        Partilhar Ficheiro (.json)
+                    </button>
+                    <button id="daily-report-btn" class="action-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><path d="M12 18v-6"/><path d="M9 15h6"/></svg>
+                        Gerar Relatório Diário (Excel)
+                    </button>
+                        <button id="share-online-btn" class="action-btn" style="background-color: var(--product-primary); color: white; border-color: var(--product-primary);">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+                        Partilhar Online
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="full-analysis-container" class="hidden">
+            <!-- ABA 1: VALIDAÇÃO DE PEDIDOS -->
+            <div id="validation-section" class="content-section">
+                <h2>Validação de Pedidos</h2>
+                <div id="validation-summary-container"></div>
+                <div id="validation-results-container"></div>
+            </div>
+
+            <!-- Resumo Geral -->
+            <div id="general-summary-section" class="content-section">
+                 <div id="sector-summary-container"></div>
+            </div>
+
+            <!-- ABA 2: ANÁLISE POR SETOR -->
+            <div id="sector-section" class="content-section">
+                <h2>Acompanhamento por Setor</h2>
+                <div id="sector-results-container"></div>
+            </div>
+
+             <!-- NOVA SEÇÃO: ETIQUETAS -->
+            <div id="label-section" class="content-section">
+                <div id="label-analysis-container"></div>
+            </div>
+            
+            <!-- NOVA SEÇÃO: FILIAIS -->
+            <div id="filial-section" class="content-section">
+                 <div id="filial-analysis-container"></div>
+            </div>
+            
+             <!-- NOVA SEÇÃO: SEM FATURAMENTO -->
+            <div id="no-billing-section" class="content-section">
+                 <div id="no-billing-container"></div>
+            </div>
+
+            <!-- ABA 3: ACOMPANHAMENTO DE PRODUTOS -->
+            <div id="product-section" class="content-section">
+                <div id="product-top20-geral-container"></div>
+                <div id="product-top20-setor-container" style="margin-top: 3rem;"></div>
+                <div id="product-search-container" style="margin-top: 3rem;">
+                    <h2>Pesquisa Livre de Produtos</h2>
+                    <div class="search-container">
+                        <input type="text" id="productSearchInput" placeholder="Pesquisar por um ou mais produtos (separar por vírgula, espaço ou ;)">
+                    </div>
+                    <div id="product-search-results-container">
+                        <div class="placeholder-card"><p>A pesquisa retornará os produtos correspondentes aqui.</p></div>
+                    </div>
+                        <div id="product-search-actions" class="hidden"></div>
+                </div>
+            </div>
+        </div>
+        <div id="initial-placeholder" class="content-section">
+            <div class="placeholder-card" style="margin-top:0;"><p>Carregue uma ou mais planilhas no <strong>Painel de Ficheiros</strong> para iniciar a análise.</p></div>
+        </div>
+    </div>
+
+    <!-- Container para o Modal de Detalhes -->
+    <div id="details-modal" class="modal-overlay hidden"></div>
+
+    <!-- Modal para partilhar link -->
+    <div id="share-link-modal" class="modal-overlay hidden">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h3 style="color: var(--primary-color);">Link de Partilha Gerado</h3>
+                <button class="modal-close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="font-size: 1em; color: var(--text-light);">Qualquer pessoa com este link poderá ver esta análise de forma interativa (apenas leitura).</p>
+                <div class="search-container" style="margin-bottom: 0;">
+                    <input type="text" id="share-link-input" readonly style="background-color: #e9ecef;">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="copy-link-btn" class="action-btn" style="background-color: var(--primary-color); color: #fff; border-color: var(--primary-color);">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
+                    Copiar Link
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- (NOVO) Modal para confirmar atualização -->
+    <div id="update-share-modal" class="modal-overlay hidden">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h3 style="color: var(--primary-color);">Atualizar Partilha Existente?</h3>
+            </div>
+            <div class="modal-body">
+                <p style="font-size: 1em; color: var(--text-light);">Já existe uma análise partilhada anteriormente. Deseja atualizar os dados dessa partilha ou criar uma nova?</p>
+                <p style="font-size: 0.9em; color: var(--warning-dark); background-color: var(--warning-light); padding: 1rem; border-radius: 0.5rem;"><strong>Atenção:</strong> Atualizar irá apagar permanentemente os dados da partilha anterior.</p>
+            </div>
+            <div class="modal-footer">
+                <button id="create-new-share-btn" class="action-btn" style="background-color: var(--secondary-color); color: #fff; border-color: var(--secondary-color);">Criar Nova</button>
+                <button id="update-existing-share-btn" class="action-btn" style="background-color: var(--primary-color); color: #fff; border-color: var(--primary-color);">Atualizar Existente</button>
+            </div>
+        </div>
+    </div>
+
+
+    <script type="module">
+        // IIFE para encapsular o código
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getFirestore, doc, getDoc, getDocs, collection, writeBatch, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        (function() {
+            // --- Firebase Initialization ---
+            let db, auth;
+
+            try {
+                const firebaseConfig = {
+                    apiKey: "AIzaSyDr544e43_iKWNVL9UCKdKONM_s9_gGxTs",
+                    authDomain: "sample-firebase-ai-app-7c4b8.firebaseapp.com",
+                    projectId: "sample-firebase-ai-app-7c4b8",
+                    storageBucket: "sample-firebase-ai-app-7c4b8.appspot.com",
+                    messagingSenderId: "6148922384",
+                    appId: "1:6148922384:web:bc6c9ee340d9726acfbe95"
+                };
+
+                if (firebaseConfig && firebaseConfig.apiKey && firebaseConfig.apiKey.startsWith("AIza")) {
+                    const app = initializeApp(firebaseConfig);
+                    auth = getAuth(app);
+                    db = getFirestore(app);
+                    signInAnonymously(auth).catch(error => {
+                        console.error("Firebase anonymous sign-in failed:", error);
+                        if (UIElements.buttons.shareOnline) {
+                            UIElements.buttons.shareOnline.disabled = true;
+                            UIElements.buttons.shareOnline.style.cursor = 'not-allowed';
+                            UIElements.buttons.shareOnline.style.opacity = '0.6';
+                            UIElements.buttons.shareOnline.title = "A partilha online está desativada devido a um erro de configuração.";
+                        }
+                        if (error.code === 'auth/admin-restricted-operation') {
+                            showNotification("AÇÃO NECESSÁRIA: Ative a Autenticação Anónima no seu projeto Firebase.", "error", 15000);
+                        } else {
+                            showNotification("Não foi possível conectar ao serviço de partilha.", "error");
+                        }
+                    });
+                } else {
+                    console.error("Firebase config não encontrada ou não preenchida.");
+                    if (UIElements.buttons.shareOnline) UIElements.buttons.shareOnline.disabled = true;
+                }
+            } catch (error) {
+                console.error("A inicialização do Firebase falhou:", error);
+            }
+            
+            // DADOS GLOBAIS
+            const masterStoreList = new Map([['VD825',{name:'DSP JEQUIE',rota:'6'}],['VD992',{name:'DSP VITORIA DA CONQUISTA',rota:'6'}],['L2437',{name:'DSP VITORIA DA CONQUISTA II',rota:'6'}],['L2527',{name:'DSP VITORIA DA CONQUISTA JURACY',rota:'6'}],['VD863',{name:'DSP BARREIRAS',rota:'6'}],['VD862',{name:'DSP LUIS EDUARDO MAGALHAES',rota:'6'}],['L2554',{name:'DSP ITABUNA III',rota:'6'}],['L2290',{name:'DSP LUIS EDUARDO MAGALHAES II',rota:'6'}],['L2291',{name:'DSP SANTO ANTONIO DE JESUS',rota:'6'}],['L2412',{name:'DSP ILHEUS',rota:'6'}],['L2662',{name:'DSP SHOPPING BOULEVARD',rota:'7'}],['L2127',{name:'DSP FEIRA DE SANTANA IV',rota:'7'}],['VD390',{name:'DSP FEIRA DE SANTANA',rota:'7'}],['L2116',{name:'DSP FEIRA DE SANTANA III',rota:'7'}],['VD630',{name:'DSP DIAS DAVILA',rota:'7'}],['VD552',{name:'DSP CAMACARI',rota:'7'}],['L2531',{name:'DSP GUARAJUBA',rota:'7'}],['L2204',{name:'DSP SHOPPING CENTER LAPA',rota:'8'}],['L2538',{name:'DSP SALVADOR 1',rota:'8'}],['L2052',{name:'DSP METRO SALVADOR',rota:'8'}],['L2283',{name:'DSP SHOPPING VITORIA BOULEVARD',rota:'8'}],['L2161',{name:'DSP CANELA II',rota:'8'}],['VD395',{name:'DSP CANELA',rota:'8'}],['L2064',{name:'DSP SALVADOR CHAME CHAME',rota:'8'}],['L2173',{name:'DSP PARQUE SHOPPING BAHIA',rota:'9'}],['L2119',{name:'DSP ESTRADA DO COCO',rota:'9'}],['L2363',{name:'DSP VILAS DO ATLANTICO I',rota:'9'}],['L2668',{name:'DSP ALPHAVILLE LITORAL NORTE',rota:'9'}],['VD547',{name:'DSP ITAPUA',rota:'9'}],['VD458',{name:'DSP ITAPUA II',rota:'9'}],['VD744',{name:'DSP PIATA',rota:'9'}],['VD737',{name:'DSP PATAMARES',rota:'9'}],['VD546',{name:'DSP JORGE AMADO',rota:'9'}],['L2003',{name:'DSP TROBOGY',rota:'10'}],['VD834',{name:'DSP SAO RAFAEL',rota:'10'}],['L2174',{name:'DSP SHOPPING PARALELA',rota:'10'}],['VD845',{name:'DSP CAJAZEIRAS',rota:'10'}],['L2221',{name:'DSP PERIPERI',rota:'10'}],['VD643',{name:'DSP SIMOES FILHO',rota:'10'}],['VD620',{name:'DSP CANDEIAS',rota:'10'}],['L2077',{name:'DSP SHOPPING BELLA VISTA',rota:'11'}],['L2211',{name:'DSP PERNAMBUES',rota:'11'}],['VD544',{name:'DSP MATATU',rota:'11'}],['VD929',{name:'DSP ACUPE DE BROTAS',rota:'11'}],['L2631',{name:'DSP BROTAS III',rota:'11'}],['VD399',{name:'DSP NOVA BROTAS',rota:'11'}],['VD981',{name:'DSP VASCO DA GAMA',rota:'11'}],['L2277',{name:'DSP FEDERACAO SALVADOR',rota:'11'}],['VD397',{name:'DSP ONDINA',rota:'11'}],['L2243',{name:'DSP SHOPPING BARRA SALVADOR',rota:'12'}],['L2088',{name:'DSP RIO VERMELHO II',rota:'12'}],['VD432',{name:'DSP PITUBA III',rota:'12'}],['L2056',{name:'DSP PITUBA IV',rota:'12'}],['VD890',{name:'DSP CAMINHO DAS ARVORES II',rota:'12'}],['VD712',{name:'DSP ANITA GARIBALDI',rota:'12'}],['VD398',{name:'DSP MIGUEL CALMON',rota:'12'}],['L2191',{name:'DSP MARES',rota:'12'}],['VD697',{name:'DSP IMBUI',rota:'13'}],['VD550',{name:'DSP COSTA AZUL',rota:'13'}],['L2123',{name:'DSP COSTA AZUL II',rota:'13'}],['VD936',{name:'DSP STIEP',rota:'13'}],['VD393',{name:'DSP CABULA',rota:'13'}],['VD821',{name:'DSP SALVADOR III',rota:'13'}],['VD530',{name:'DSP LAURO DE FREITAS',rota:'14'}],['VD558',{name:'DSP STELLA MARIS',rota:'14'}],['VD926',{name:'DSP CABULA II',rota:'15'}],['L2169',{name:'DSP CANDEAL',rota:'15'}],['L2093',{name:'DSP SHOPPING DA BAHIA 3 PISO',rota:'15'}],['L2092',{name:'DSP SHOPPING DA BAHIA 2 PISO',rota:'15'}],['L2091',{name:'DSP SHOPPING DA BAHIA 1 PISO',rota:'15'}],['VD713',{name:'DSP LARGO DO TAMARINEIRO',rota:'16'}],['VD970',{name:'DSP CAMINHO DE AREIA',rota:'16'}],['VD604',{name:'DSP GRACA',rota:'16'}],['VD220',{name:'DSP PITUBA',rota:'16'}],['VD434',{name:'DSP ALTO DO ITAIGARA',rota:'16'}],['VD568',{name:'DSP CAMINHO DAS ARVORES',rota:'16'}],['VD913',{name:'DSP CAMINHO DAS ARVORES III',rota:'20'}],['VD435',{name:'DSP SHOPPING SALVADOR',rota:'20'}],['L2280',{name:'DSP ALPHAVILLE SALVADOR',rota:'20'}],['L2507',{name:'DSP SHOPPING PATTEO OLINDA',rota:'1'}],['L2526',{name:'DSP SHOPPING CARUARU',rota:'1'}],['L2438',{name:'DSP CARUARU II',rota:'1'}],['L2384',{name:'DSP VITORIA DE SANTO ANTAO',rota:'1'}],['VD794',{name:'DSP JANGA',rota:'1'}],['VD871',{name:'DSP OLINDA II',rota:'1'}],['VD698',{name:'DSP OLINDA',rota:'2'}],['L2493',{name:'DSP ESPINHEIRO',rota:'2'}],['VD288',{name:'DSP RECIFE CENTRO II',rota:'2'}],['L2589',{name:'DSP IPUTINGA',rota:'2'}],['L2368',{name:'DSP CAXANGA',rota:'2'}],['L2386',{name:'DSP IMBIRIBEIRA',rota:'2'}],['L2421',{name:'DSP IPSEP',rota:'2'}],['VD772',{name:'DSP BOA VIAGEM',rota:'3'}],['L2617',{name:'DPSP CONSELHEIRO AGUIAR III',rota:'3'}],['VD755',{name:'DSP BOA VIAGEM II',rota:'3'}],['L2534',{name:'DSP DOMINGOS FERREIRA',rota:'3'}],['L2453',{name:'DSP RIBEIRO DE BRITO',rota:'3'}],['VD770',{name:'DSP BOA VIAGEM V',rota:'3'}],['L2597',{name:'DSP SETUBAL',rota:'3'}],['VD767',{name:'DSP GUARARAPES III',rota:'3'}],['L2371',{name:'DSP ROSA E SILVA',rota:'4'}],['L2375',{name:'DSP ESTRADA DO ARRAIAL',rota:'4'}],['VD695',{name:'DSP TORRE',rota:'4'}],['L2383',{name:'DSP MADALENA II',rota:'4'}],['L2074',{name:'DSP SHOPPING RIOMAR',rota:'4'}],['VD690',{name:'DSP BOA VIAGEM IV',rota:'4'}],['L2508',{name:'DSP SHOPPING RECIFE',rota:'4'}],['L2428',{name:'DSP PETROLINA',rota:'5'}],['L2429',{name:'DSP PETROLina CENTRO',rota:'5'}],['L2496',{name:'DSP PETROLINA II',rota:'5'}],['L2582',{name:'DSP SHOPPING RIVER',rota:'5'}]]);
+            
+            const appState = { 
+                ordersData: [], 
+                sectorData: [],
+                addressData: new Map(),
+                productMasterData: new Map(),
+                nonReturnedOrders: new Set(),
+                processedData: {},
+                selectedProducts: new Set()
+            };
+            let isReadOnlySharedView = false;
+            let panelHasBeenAutoClosed = false;
+            let notificationTimeout;
+
+            const customOrder = ["AL FRAGIL", "AL BIG", "Alimentos", "Antibioticos", "MED BIG", "Medicamento 1", "Medicamento 2", "P1 BIG", "Perfumaria 1", "P2 BIG", "Perfumaria 2", "Perfumaria 3", "Piscotropicos", "SEM GIRO", "Romaneio", "Fralda", "Termolabeis", "Volumosos", "Visados", "Visados 2", "Baixo Giro", "Especial"];
+            const orderMap = new Map(customOrder.map((name, index) => [name.toUpperCase(), index]));
+            const getOrder = (sectorName) => orderMap.get(sectorName.toUpperCase()) ?? Infinity;
+            const labelSectors = new Set(['P1 BIG', 'P2 BIG', 'FRALDA', 'FR', 'MED BIG', 'ROMANEIO', 'RM', 'AL BIG']);
+
+
+            const UIElements = {
+                notification: document.getElementById('notification'),
+                loader: document.getElementById('loader'),
+                lastUpdatedContainer: document.getElementById('last-updated-container'),
+                buttons: {
+                    reloadFiles: document.getElementById('reload-files-btn'),
+                    exportData: document.getElementById('export-data-btn'),
+                    dailyReport: document.getElementById('daily-report-btn'),
+                    shareOnline: document.getElementById('share-online-btn')
+                },
+                inputs: {
+                    orders: document.getElementById('ordersFileInput'),
+                    status: document.getElementById('statusFileInput'),
+                    sector: document.getElementById('sectorFileInput'),
+                    address: document.getElementById('addressFileInput'),
+                    productMaster: document.getElementById('productMasterFileInput'),
+                    sharedFile: document.getElementById('sharedFileInput')
+                },
+                dropAreas: {
+                    orders: document.getElementById('ordersFileInputArea'),
+                    status: document.getElementById('statusFileInputArea'),
+                    sector: document.getElementById('sectorFileInputArea'),
+                    address: document.getElementById('addressFileInputArea'),
+                    productMaster: document.getElementById('productMasterFileInputArea'),
+                    sharedFile: document.getElementById('sharedFileInputArea')
+                },
+                containers: {
+                    validationSummary: document.getElementById('validation-summary-container'),
+                    validationResults: document.getElementById('validation-results-container'),
+                    sectorSummary: document.getElementById('sector-summary-container'),
+                    sectorResults: document.getElementById('sector-results-container'),
+                    actions: document.getElementById('actions-container'),
+                    fullAnalysis: document.getElementById('full-analysis-container'),
+                    initialPlaceholder: document.getElementById('initial-placeholder'),
+                    labelAnalysis: document.getElementById('label-analysis-container'),
+                    filialAnalysis: document.getElementById('filial-analysis-container'),
+                    noBilling: document.getElementById('no-billing-container')
+                },
+                fileControl: {
+                    panel: document.getElementById('file-control-panel'),
+                    header: document.getElementById('file-control-header'),
+                    icon: document.querySelector('#file-control-header .toggle-icon')
+                },
+                sections: {
+                    validation: document.getElementById('validation-section'),
+                    generalSummary: document.getElementById('general-summary-section'),
+                    sector: document.getElementById('sector-section'),
+                    label: document.getElementById('label-section'),
+                    filial: document.getElementById('filial-section'),
+                    noBilling: document.getElementById('no-billing-section'),
+                    product: document.getElementById('product-section'),
+                }
+            };
+
+            function showNotification(message, type = 'success', duration = 3500) {
+                clearTimeout(notificationTimeout);
+                UIElements.notification.textContent = message;
+                UIElements.notification.className = 'notification';
+                UIElements.notification.classList.add(type, 'show');
+                notificationTimeout = setTimeout(() => UIElements.notification.classList.remove('show'), duration);
+            }
+
+            function normalizeCode(code) {
+                if (code === null || typeof code === 'undefined') return '';
+                const strCode = String(code).trim();
+                return /^\d+$/.test(strCode) ? String(parseInt(strCode, 10)) : strCode;
+            }
+            
+            function formatNumber(num) {
+                if (typeof num !== 'number') return num;
+                return Math.round(num).toLocaleString('pt-BR');
+            }
+
+            function updateTimestamp(isoString) {
+                const now = isoString ? new Date(isoString) : new Date();
+                const pad = (num) => String(num).padStart(2, '0');
+                const formattedTimestamp = 
+                    `${pad(now.getDate())}/${pad(now.getMonth() + 1)}/${now.getFullYear()} ` +
+                    `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+                
+                UIElements.lastUpdatedContainer.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    <span>Última atualização: <strong>${formattedTimestamp}</strong></span>`;
+                
+                UIElements.lastUpdatedContainer.classList.remove('hidden');
+                if(!isoString) localStorage.setItem('lastUpdateTime', now.toISOString());
+            }
+
+            function setupFileDropArea(dropArea, fileInput) {
+                ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                    dropArea.addEventListener(eventName, e => { e.preventDefault(); e.stopPropagation(); }, false);
+                });
+                ['dragenter', 'dragover'].forEach(eventName => dropArea.addEventListener(eventName, () => dropArea.classList.add('dragover'), false));
+                ['dragleave', 'drop'].forEach(eventName => dropArea.addEventListener(eventName, () => dropArea.classList.remove('dragover'), false));
+                dropArea.addEventListener('drop', e => {
+                    fileInput.files = e.dataTransfer.files;
+                    fileInput.dispatchEvent(new Event('change'));
+                }, false);
+            }
+
+            function processUploadedFile(file, processFn) {
+                if (!file) return;
+                UIElements.loader.classList.remove('hidden');
+                setTimeout(() => {
+                    const reader = new FileReader();
+                    reader.onload = e => {
+                        try {
+                            const workbook = XLSX.read(e.target.result, { type: 'array' });
+                            const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+                            const jsonData = XLSX.utils.sheet_to_json(worksheet);
+                            processFn(jsonData);
+                        } catch (error) {
+                            console.error("Erro ao processar o ficheiro:", error);
+                            showNotification('Erro ao ler a planilha.', 'error');
+                        } finally {
+                            UIElements.loader.classList.add('hidden');
+                        }
+                    };
+                    reader.onerror = () => {
+                        UIElements.loader.classList.add('hidden');
+                        showNotification('Falha ao ler o ficheiro.', 'error');
+                    };
+                    reader.readAsArrayBuffer(file);
+                }, 50);
+            }
+            
+            function handleOrdersFile(event) {
+                processUploadedFile(event.target.files[0], (data) => {
+                    appState.ordersData = data;
+                    try {
+                        localStorage.setItem('ordersData', JSON.stringify(data));
+                        showNotification('Planilha de pedidos carregada e guardada!', 'success');
+                    } catch (e) {
+                        console.warn("Não foi possível guardar 'ordersData' no localStorage:", e);
+                        showNotification('Planilha de pedidos carregada (ficheiro grande, não será guardado para a próxima sessão).', 'warning');
+                    }
+                    UIElements.dropAreas.orders.classList.add('loaded');
+                    UIElements.containers.actions.classList.remove('hidden');
+                    updateTimestamp();
+                    runAllAnalyses();
+                });
+            }
+
+            function handleStatusFile(event) {
+                processUploadedFile(event.target.files[0], (data) => {
+                    appState.nonReturnedOrders.clear();
+                    data.forEach(row => {
+                        const orderId = String(row['Pedido Final'] || '').trim();
+                        const status = String(row['Status'] || '').trim().toUpperCase();
+                        if (orderId && status === 'NÃO RETORNADO') {
+                            appState.nonReturnedOrders.add(orderId);
+                        }
+                    });
+                    try {
+                        localStorage.setItem('nonReturnedOrders', JSON.stringify(Array.from(appState.nonReturnedOrders)));
+                        showNotification(`${appState.nonReturnedOrders.size} pedidos pendentes encontrados e guardados.`, 'success');
+                    } catch (e) {
+                        console.warn("Não foi possível guardar 'nonReturnedOrders' no localStorage:", e);
+                        showNotification(`${appState.nonReturnedOrders.size} pedidos pendentes encontrados (não serão guardados para a próxima sessão).`, 'warning');
+                    }
+                    UIElements.dropAreas.status.classList.add('loaded');
+                    UIElements.containers.actions.classList.remove('hidden');
+                    updateTimestamp();
+                    runAllAnalyses();
+                });
+            }
+
+            function handleSectorFile(event) {
+                processUploadedFile(event.target.files[0], (data) => {
+                    appState.sectorData = data;
+                    try {
+                        localStorage.setItem('sectorData', JSON.stringify(data));
+                        showNotification('Planilha de itens carregada e guardada!', 'success');
+                    } catch (e) {
+                        console.warn("Não foi possível guardar 'sectorData' no localStorage:", e);
+                        showNotification('Planilha de itens carregada (ficheiro grande, não será guardado para a próxima sessão).', 'warning');
+                    }
+                    UIElements.dropAreas.sector.classList.add('loaded');
+                    UIElements.containers.actions.classList.remove('hidden');
+                    updateTimestamp();
+                    runAllAnalyses();
+                });
+            }
+
+            function handleAddressFile(event) {
+                processUploadedFile(event.target.files[0], (data) => {
+                    appState.addressData.clear();
+                    data.forEach(row => {
+                        const code = normalizeCode(row['Código Produto'] || row['Item']);
+                        const address = String(row['Endereço'] || '').trim();
+                        if (code && address) appState.addressData.set(code, address);
+                    });
+                    try {
+                        localStorage.setItem('addressData', JSON.stringify(Array.from(appState.addressData.entries())));
+                        showNotification(`${appState.addressData.size} endereços carregados e guardados.`, 'success');
+                    } catch (e) {
+                        console.warn("Não foi possível guardar 'addressData' no localStorage:", e);
+                        showNotification(`${appState.addressData.size} endereços carregados (não serão guardados para a próxima sessão).`, 'warning');
+                    }
+                    UIElements.dropAreas.address.classList.add('loaded');
+                    UIElements.containers.actions.classList.remove('hidden');
+                    updateTimestamp();
+                    runAllAnalyses();
+                });
+            }
+            
+            function handleProductMasterFile(event) {
+                processUploadedFile(event.target.files[0], (data) => {
+                    appState.productMasterData.clear();
+                    data.forEach(row => {
+                        const code = normalizeCode(row['Código'] || row['Item']);
+                        const qms = parseInt(row['QMS'], 10);
+                        if (code && !isNaN(qms)) {
+                            appState.productMasterData.set(code, qms);
+                        }
+                    });
+                    try {
+                        localStorage.setItem('productMasterData', JSON.stringify(Array.from(appState.productMasterData.entries())));
+                        showNotification(`${appState.productMasterData.size} QMS de produtos carregados e guardados.`, 'success');
+                    } catch (e) {
+                        console.warn("Não foi possível guardar 'productMasterData' no localStorage:", e);
+                        showNotification(`${appState.productMasterData.size} QMS carregados (não serão guardados para a próxima sessão).`, 'warning');
+                    }
+                    UIElements.dropAreas.productMaster.classList.add('loaded');
+                    UIElements.containers.actions.classList.remove('hidden');
+                    updateTimestamp();
+                    runAllAnalyses();
+                });
+            }
+
+            function handleSharedFile(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = e => {
+                    try {
+                        const sharedData = JSON.parse(e.target.result);
+                        loadDataFromSharedObject(sharedData, true);
+                        showNotification('Relatório partilhado importado com sucesso!', 'success');
+                    } catch (error) {
+                        console.error("Erro ao importar ficheiro partilhado:", error);
+                        showNotification('Ficheiro de partilha inválido ou corrompido.', 'error');
+                    }
+                };
+                reader.readAsText(file);
+            }
+
+            function autoClosePanel() {
+                if (!panelHasBeenAutoClosed && UIElements.fileControl.panel.classList.contains('open')) {
+                    UIElements.fileControl.header.click();
+                    panelHasBeenAutoClosed = true;
+                }
+            }
+
+            function runAllAnalyses() {
+                const hasOrders = appState.ordersData.length > 0;
+                const hasStatus = appState.nonReturnedOrders.size > 0;
+                const hasItems = appState.sectorData.length > 0;
+
+                UIElements.containers.initialPlaceholder.classList.add('hidden');
+                UIElements.containers.fullAnalysis.classList.remove('hidden');
+
+                if (hasOrders && hasStatus) {
+                    runValidationAnalysis();
+                    UIElements.sections.validation.classList.remove('hidden');
+                } else {
+                    UIElements.sections.validation.classList.add('hidden');
+                }
+
+                if (hasItems) {
+                    runSectorAnalysis();
+                    runProductAnalysis();
+                    UIElements.sections.generalSummary.classList.remove('hidden');
+                    UIElements.sections.sector.classList.remove('hidden');
+                    UIElements.sections.label.classList.remove('hidden');
+                    UIElements.sections.filial.classList.remove('hidden');
+                    UIElements.sections.noBilling.classList.remove('hidden');
+                    UIElements.sections.product.classList.remove('hidden');
+                } else {
+                    UIElements.sections.generalSummary.classList.add('hidden');
+                    UIElements.sections.sector.classList.add('hidden');
+                    UIElements.sections.label.classList.add('hidden');
+                    UIElements.sections.filial.classList.add('hidden');
+                    UIElements.sections.noBilling.classList.add('hidden');
+                    UIElements.sections.product.classList.add('hidden');
+                }
+            }
+            
+            function runValidationAnalysis() {
+                 if (appState.ordersData.length === 0 || appState.nonReturnedOrders.size === 0) {
+                     UIElements.containers.validationResults.innerHTML = `<div class="placeholder-card"><p>Carregue a <strong>Planilha de Pedidos</strong> e a <strong>Planilha de Status</strong> para iniciar a validação.</p></div>`;
+                     UIElements.containers.validationSummary.innerHTML = '';
+                     return;
+                 }
+                
+                const filteredData = appState.ordersData.filter(row => {
+                    const orderId = String(row['C. Legado'] || '').trim();
+                    return orderId && appState.nonReturnedOrders.has(orderId);
+                });
+
+                if (filteredData.length === 0) {
+                    UIElements.containers.validationSummary.innerHTML = `
+                        <div class="summary-card" style="background-color: var(--warning-light); border-color: var(--warning-color); color: var(--warning-dark); text-align: left;">
+                            <style> .summary-card ul { font-size: 0.9em; margin-top: 1rem; list-style-position: inside; padding-left: 0;} .summary-card li { margin-bottom: 0.5rem; } </style>
+                            <h2>Nenhum Pedido Pendente Encontrado</h2>
+                            <p style="font-size: 1em; font-weight: 500;">A análise não retornou resultados.</p>
+                        </div>`;
+                    UIElements.containers.validationResults.innerHTML = '';
+                    autoClosePanel();
+                    return;
+                }
+                const uniquePendingOrders = new Set(filteredData.map(row => String(row['C. Legado'] || '').trim()));
+                const rotasData = {};
+                let totalUnidades = 0;
+                for (const row of filteredData) {
+                    const quantidade = parseFloat(row['Tot'] || row['Sum Qtd Solicitada'] || 0);
+                    const pedidoLegado = String(row['C. Legado'] || '').trim();
+                    if (isNaN(quantidade) || !pedidoLegado) continue;
+                    totalUnidades += quantidade;
+                    const clienteField = String(row['Cliente'] || '').trim();
+                    const codigoLoja = clienteField.split('-')[0].trim();
+                    let rotaOriginal = String(row['Rota'] || 'N/A').trim();
+                    const storeInfo = masterStoreList.get(codigoLoja);
+                    if (storeInfo && rotaOriginal === '916') rotaOriginal = storeInfo.rota;
+                    const nomeLoja = storeInfo ? storeInfo.name : clienteField.split('-').slice(1).join('-').trim() || 'N/A';
+                    if (!rotasData[rotaOriginal]) rotasData[rotaOriginal] = { pedidos: [] };
+                    rotasData[rotaOriginal].pedidos.push({ codigo: codigoLoja, nome: nomeLoja, pedido: pedidoLegado, qtd: quantidade });
+                }
+                UIElements.containers.validationSummary.innerHTML = `<div class="summary-card"><p>${uniquePendingOrders.size} pedidos pendentes, totalizando ${Math.round(totalUnidades)} unidades.</p></div>`;
+                displayValidationRouteResults(rotasData, UIElements.containers.validationResults);
+                autoClosePanel();
+            }
+
+            function runSectorAnalysis() {
+                if (appState.sectorData.length === 0) {
+                    return;
+                }
+
+                const setoresData = new Map();
+                const filialData = new Map();
+                const filiaisComFaturamento = new Set();
+                let totalQuantidade = 0;
+                let totalSkus = new Set();
+
+                for (const row of appState.sectorData) {
+                    const quantidade = parseFloat(row['Qtd'] || row['Sum Qtd Solicitada'] || row['Tot'] || 0);
+                    const itemCode = normalizeCode(row['Item']);
+                    if (isNaN(quantidade) || !itemCode) continue;
+
+                    totalQuantidade += quantidade;
+                    totalSkus.add(itemCode);
+                    
+                    const codigoLoja = String(row['Loja Cross'] || row['Código da Loja'] || '').trim();
+                    if (codigoLoja) {
+                        filiaisComFaturamento.add(codigoLoja);
+                        let rota = String(row['Rota'] || 'N/A').trim();
+                        const storeInfo = masterStoreList.get(codigoLoja);
+                        const nomeLoja = storeInfo ? storeInfo.name : (String(row['Nome da Loja'] || '').trim() || 'N/A');
+                        if (storeInfo && rota === '916') rota = storeInfo.rota;
+                        if (!filialData.has(rota)) filialData.set(rota, new Map());
+                        const filiaisDaRota = filialData.get(rota);
+                        const filialKey = `${codigoLoja} - ${nomeLoja}`;
+                        filiaisDaRota.set(filialKey, (filiaisDaRota.get(filialKey) || 0) + quantidade);
+                    }
+
+                    const address = appState.addressData.get(itemCode);
+                    if (address) { 
+                        const setor = address.split('.')[0];
+                        const descr = String(row['Descr'] || 'N/A').trim();
+                        if (!setoresData.has(setor)) {
+                            setoresData.set(setor, { 
+                                totalQtd: 0, 
+                                products: new Map(), 
+                                totalLabels: 0,
+                                labelsByRoute: new Map()
+                            });
+                        }
+                        const setorInfo = setoresData.get(setor);
+                        setorInfo.totalQtd += quantidade;
+                        const productInfo = setorInfo.products.get(itemCode) || { descr: descr, totalQtd: 0 };
+                        productInfo.totalQtd += quantidade;
+                        setorInfo.products.set(itemCode, productInfo);
+                        
+                        if (labelSectors.has(setor.toUpperCase())) {
+                            const qms = appState.productMasterData.get(itemCode) || 1;
+                            if (qms > 0) {
+                                const labelsForThisItem = Math.ceil(quantidade / qms);
+                                setorInfo.totalLabels += labelsForThisItem;
+                                
+                                let rota = String(row['Rota'] || 'N/A').trim();
+                                const storeInfo = masterStoreList.get(String(row['Loja Cross'] || row['Código da Loja'] || '').trim());
+                                if (storeInfo && rota === '916') rota = storeInfo.rota;
+
+                                const currentRouteLabels = setorInfo.labelsByRoute.get(rota) || 0;
+                                setorInfo.labelsByRoute.set(rota, currentRouteLabels + labelsForThisItem);
+                            }
+                        }
+                    }
+                }
+                const totalUniqueFiliais = filiaisComFaturamento.size;
+                const filiaisSemFaturamento = [];
+                for (const [storeCode, storeInfo] of masterStoreList.entries()) {
+                    if (!filiaisComFaturamento.has(storeCode)) filiaisSemFaturamento.push(`${storeCode} - ${storeInfo.name}`);
+                }
+                
+                appState.processedData.sectorAnalysis = { setoresData, filialData, totalQuantidadeGeral: totalQuantidade, totalSkusGeral: totalSkus.size, totalUniqueFiliais, filiaisSemFaturamento };
+                UIElements.containers.sectorSummary.innerHTML = `
+                    <div class="geral-summary-grid">
+                        <div class="geral-summary-card"><div class="icon sector"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg></div><div class="info"><p>Quantidade Total</p><div class="value">${formatNumber(totalQuantidade)}</div></div></div>
+                        <div class="geral-summary-card"><div class="icon skus"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4"/><path d="M12 20v2"/><path d="M5 12H3"/><path d="M21 12h-2"/><path d="m18.36 5.64-.18-.18"/><path d="m5.82 18.18-.18-.18"/><path d="m18.18 18.18-.18.18"/><path d="m5.64 5.64-.18.18"/></svg></div><div class="info"><p>Total de SKUs Analisados</p><div class="value">${formatNumber(totalSkus.size)}</div></div></div>
+                    </div>`;
+                displaySectorResults(appState.processedData.sectorAnalysis);
+                autoClosePanel();
+            }
+
+            function runProductAnalysis() {
+                 if (appState.sectorData.length === 0) {
+                     return;
+                 }
+                const productQuantities = new Map();
+                const productDescriptions = new Map();
+                const productSalesDetails = new Map();
+                for (const row of appState.sectorData) {
+                    const code = normalizeCode(row['Item']);
+                    const qty = parseFloat(row['Qtd'] || row['Sum Qtd Solicitada'] || row['Tot'] || 0);
+                    const descr = String(row['Descr'] || 'N/A').trim();
+                    if (code && !isNaN(qty)) {
+                        productQuantities.set(code, (productQuantities.get(code) || 0) + qty);
+                        if (!productDescriptions.has(code)) productDescriptions.set(code, descr);
+                        if (!productSalesDetails.has(code)) productSalesDetails.set(code, []);
+                        productSalesDetails.get(code).push(row);
+                    }
+                }
+                const totalGeralUnidades = [...productQuantities.values()].reduce((sum, qty) => sum + qty, 0);
+                const analysisData = [...productQuantities.entries()].map(([code, unidades]) => {
+                    const qms = appState.productMasterData.get(code) || 1;
+                    const address = appState.addressData.get(code) || 'N/A';
+                    const setor = address !== 'N/A' ? address.split('.')[0] : 'N/A';
+                    return { codigo: code, skus: productDescriptions.get(code) || 'N/A', unidades: unidades, qms: qms, cx: qms > 0 ? unidades / qms : 0, percent: totalGeralUnidades > 0 ? (unidades / totalGeralUnidades) * 100 : 0, setor: setor, posicao: address };
+                });
+                analysisData.sort((a, b) => b.unidades - a.unidades);
+                appState.processedData.productAnalysis = { analysisData, productSalesDetails };
+                displayProductAnalysisResults(analysisData);
+                const productsBySector = analysisData.reduce((acc, product) => {
+                    const sector = product.setor || 'N/A';
+                    if (!acc[sector]) acc[sector] = [];
+                    acc[sector].push(product);
+                    return acc;
+                }, {});
+                displayTop20BySector(productsBySector);
+                setupProductSearch(analysisData, productSalesDetails);
+            }
+            
+            function displayValidationRouteResults(rotasData, container) {
+                container.innerHTML = "";
+                const sortedRotas = Object.keys(rotasData).sort((a, b) => Number(a) - Number(b));
+                sortedRotas.forEach(rota => {
+                    const rotaInfo = rotasData[rota];
+                    const totalPedidosCount = rotaInfo.pedidos.length;
+                    const totalItensGeral = rotaInfo.pedidos.reduce((sum, p) => sum + p.qtd, 0);
+                    const accordionItem = document.createElement('div');
+                    accordionItem.className = 'rota-accordion-item';
+                    rotaInfo.pedidos.sort((a, b) => a.pedido.localeCompare(b.pedido, undefined, { numeric: true }));
+                    const tableRows = rotaInfo.pedidos.map(p => `<tr><td>${p.codigo}</td><td>${p.nome}</td><td>${p.pedido}</td><td>${Math.round(p.qtd)}</td></tr>`).join('');
+                    accordionItem.innerHTML = `
+                        <div class="rota-accordion-header">
+                            <h2>Rota ${rota}</h2>
+                            <div class="rota-summary-info">
+                                <span>${totalPedidosCount} Pedido(s)</span>
+                                <span>|</span>
+                                <span>${Math.round(totalItensGeral)} Unidades</span>
+                            </div>
+                            <span class="toggle-icon-rota">▼</span>
+                        </div>
+                        <div class="rota-accordion-content">
+                            <div class="content-wrapper table-responsive-wrapper">
+                                <table>
+                                    <thead><tr><th>VD/L</th><th>Filial</th><th>Nº Pedido</th><th>Qtd. Total</th></tr></thead>
+                                    <tbody>${tableRows}</tbody>
+                                </table>
+                            </div>
+                        </div>`;
+                    accordionItem.querySelector('.rota-accordion-header').addEventListener('click', () => accordionItem.classList.toggle('open'));
+                    container.appendChild(accordionItem);
+                });
+            }
+
+            function displaySectorResults({ setoresData, filialData, totalQuantidadeGeral, totalSkusGeral, totalUniqueFiliais, filiaisSemFaturamento }) {
+                const sectorContainer = UIElements.containers.sectorResults;
+                const labelContainer = UIElements.containers.labelAnalysis;
+                const filialContainer = UIElements.containers.filialAnalysis;
+                const noBillingContainer = UIElements.containers.noBilling;
+
+                sectorContainer.innerHTML = '';
+                labelContainer.innerHTML = '';
+                filialContainer.innerHTML = '';
+                noBillingContainer.innerHTML = '';
+                
+                if (setoresData.size > 0) {
+                    const sectorsByUnits = [...setoresData.entries()].sort((a, b) => b[1].totalQtd - a[1].totalQtd);
+                    const threatMap = new Map();
+                    const highThreatCount = Math.ceil(sectorsByUnits.length * 0.25);
+                    const mediumThreatCount = Math.ceil(sectorsByUnits.length * 0.60);
+                    sectorsByUnits.forEach(([setor], index) => {
+                        if (index < highThreatCount) threatMap.set(setor, 'threat-high');
+                        else if (index < mediumThreatCount) threatMap.set(setor, 'threat-medium');
+                        else threatMap.set(setor, 'threat-low');
+                    });
+                    const sortedSetores = [...setoresData.entries()].sort((a, b) => getOrder(a[0]) - getOrder(b[0]) || a[0].localeCompare(b[0]));
+                    const tableRows = sortedSetores.map(([setor, data]) => `<tr class="${threatMap.get(setor) || 'threat-low'}"><td class="col-setor">${setor}</td><td class="col-unidades">${formatNumber(data.totalQtd)}</td><td class="col-skus">${formatNumber(data.products.size)}</td><td class="col-percent">${(totalQuantidadeGeral > 0 ? (data.totalQtd / totalQuantidadeGeral) * 100 : 0).toFixed(1).replace('.', ',')}%</td></tr>`).join('');
+                    const totalPercent = sortedSetores.reduce((sum, [, data]) => sum + (data.totalQtd / totalQuantidadeGeral), 0) * 100;
+                    sectorContainer.innerHTML = `<button class="copy-image-btn" data-target="#sector-analysis-table-wrapper" data-filename="analise_por_setor.png"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/></svg>Copiar como Imagem</button><div class="table-responsive-wrapper" id="sector-analysis-table-wrapper"><table id="sector-analysis-table"><thead><tr><th class="col-setor">Setor</th><th class="col-unidades">Unidades</th><th class="col-skus">SKUs</th><th class="col-percent">%</th></tr></thead><tbody>${tableRows}</tbody><tfoot><tr><td class="col-setor">TOTAL</td><td class="col-unidades">${formatNumber(totalQuantidadeGeral)}</td><td class="col-skus">${formatNumber(totalSkusGeral)}</td><td class="col-percent">${totalPercent.toFixed(1).replace('.', ',')}%</td></tr></tfoot></table></div>`;
+                } else {
+                    sectorContainer.innerHTML = `<div class='placeholder-card'><p>Carregue a <strong>Planilha de Endereços</strong> para visualizar o acompanhamento por setor.</p></div>`;
+                }
+
+                const sortedSetoresForLabels = [...setoresData.entries()].sort((a, b) => getOrder(a[0]) - getOrder(b[0]) || a[0].localeCompare(b[0]));
+                const labelSectorsData = sortedSetoresForLabels.filter(([setor]) => labelSectors.has(setor.toUpperCase()));
+                if (labelSectorsData.length > 0) {
+                    if (appState.productMasterData.size === 0 && !isReadOnlySharedView) {
+                        labelContainer.innerHTML = `<h2>Estimativa de Etiquetas por Rota (QMS)</h2><div class="placeholder-card"><p>Carregue a planilha de <strong>Cadastro de Produtos (QMS)</strong> para ver a estimativa de etiquetas.</p></div>`;
+                    } else {
+                        const allRoutesWithLabels = new Set();
+                        labelSectorsData.forEach(([, data]) => {
+                            for (const rota of data.labelsByRoute.keys()) {
+                                allRoutesWithLabels.add(rota);
+                            }
+                        });
+                        const sortedRoutes = [...allRoutesWithLabels].sort((a, b) => String(a).localeCompare(String(b), undefined, {numeric: true}));
+                        
+                        const sortedLabelSectors = labelSectorsData.map(([setor]) => setor);
+
+                        let headerHtml = `<th>Rota</th>`;
+                        sortedLabelSectors.forEach(setor => {
+                            headerHtml += `<th class="text-right">${setor}</th>`;
+                        });
+                        headerHtml += `<th class="text-right">Total Rota</th>`;
+
+                        const labelTableRows = sortedRoutes.map(rota => {
+                            let rowHtml = `<tr><td><strong>Rota ${rota}</strong></td>`;
+                            let totalRota = 0;
+                            
+                            labelSectorsData.forEach(([setor, data]) => {
+                                const count = data.labelsByRoute.get(rota) || 0;
+                                totalRota += count;
+                                rowHtml += `<td class="text-right">${count > 0 ? formatNumber(count) : '-'}</td>`;
+                            });
+                            
+                            rowHtml += `<td class="text-right"><strong>${formatNumber(totalRota)}</strong></td></tr>`;
+                            return rowHtml;
+                        }).join('');
+
+                        let footerHtml = `<tr><td><strong>TOTAL SETOR</strong></td>`;
+                        let grandTotal = 0;
+                        
+                        labelSectorsData.forEach(([setor, data]) => {
+                            const totalSetor = data.totalLabels;
+                            grandTotal += totalSetor;
+                            footerHtml += `<td class="text-right"><strong>${formatNumber(totalSetor)}</strong></td>`;
+                        });
+                        
+                        footerHtml += `<td class="text-right"><strong>${formatNumber(grandTotal)}</strong></td></tr>`;
+
+                        labelContainer.innerHTML = `<h2>Estimativa de Etiquetas por Rota (QMS)</h2>
+                            <button class="copy-image-btn" data-target="#label-analysis-table-wrapper" data-filename="analise_etiquetas_por_rota.png"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/></svg>Copiar como Imagem</button>
+                            <div class="table-responsive-wrapper" id="label-analysis-table-wrapper">
+                                <table id="label-analysis-table" style="border: 1px solid var(--border-color);">
+                                    <thead><tr>${headerHtml}</tr></thead>
+                                    <tbody>${labelTableRows}</tbody>
+                                    <tfoot style="background-color: var(--sector-light); border-top: 2px solid var(--sector-primary);">${footerHtml}</tfoot>
+                                </table>
+                            </div>`;
+                    }
+                } else {
+                     labelContainer.innerHTML = ``;
+                }
+
+                if (filialData && filialData.size > 0) {
+                    const sortedRotas = [...filialData.keys()].sort((a, b) => Number(a) - Number(b));
+                    const filialAccordionsHTML = sortedRotas.map((rota, index) => {
+                        const filiaisDaRota = filialData.get(rota); if (!filiaisDaRota) return '';
+                        const sortedFiliais = [...filiaisDaRota.entries()].sort((a, b) => b[1] - a[1]);
+                        const totalRota = sortedFiliais.reduce((sum, [, qtd]) => sum + qtd, 0);
+                        const filialRows = sortedFiliais.map(([filial, qtd]) => `<tr><td>${filial}</td><td>${formatNumber(qtd)}</td><td>${(totalRota > 0 ? (qtd / totalRota) * 100 : 0).toFixed(0)}%</td></tr>`).join('');
+                        return `<div class="rota-accordion-item"><div class="rota-accordion-header"><h2>Rota: ${rota}</h2><div class="rota-summary-info"><span>${sortedFiliais.length} Filial(is)</span><span>|</span><span>${formatNumber(totalRota)} Unidades</span></div><span class="toggle-icon-rota">▼</span></div><div class="rota-accordion-content"><div class="content-wrapper table-responsive-wrapper"><button class="copy-image-btn" data-target="#filial-table-${index}" data-filename="faturamento_rota_${rota}.png" style="margin-bottom: 1rem;">Copiar como Imagem</button><table id="filial-table-${index}"><thead><tr><th>Filial</th><th>Unidades</th><th>% da Rota</th></tr></thead><tbody>${filialRows}</tbody><tfoot><tr><td><strong>Total Rota</strong></td><td><strong>${formatNumber(totalRota)}</strong></td><td><strong>100%</strong></td></tr></tfoot></table></div></div></div>`;
+                    }).join('');
+                    filialContainer.innerHTML = `<h2>Faturamento por Filiais</h2><div class="summary-card"><h2>Resumo de Filiais</h2><p>${formatNumber(totalUniqueFiliais)} filiais faturaram no período.</p></div><div id="filial-accordion-container">${filialAccordionsHTML}</div>`;
+                    filialContainer.querySelectorAll('.rota-accordion-header').forEach(header => header.addEventListener('click', () => header.parentElement.classList.toggle('open')));
+                } else {
+                    filialContainer.innerHTML = `<h2>Faturamento por Filiais</h2><div class='placeholder-card'><p>A <strong>Planilha de Itens</strong> precisa conter as colunas "Loja Cross" ou "Código da Loja" para esta análise.</p></div>`;
+                }
+
+                if (filiaisSemFaturamento && filiaisSemFaturamento.length > 0) {
+                    const listaFiliais = filiaisSemFaturamento.sort().map(filial => `<li>${filial}</li>`).join('');
+                    noBillingContainer.innerHTML = `<h2>Filiais Sem Faturamento</h2><div class="summary-card"><h2>Atenção</h2><p>${filiaisSemFaturamento.length} filiais não apresentaram faturamento no período.</p></div><div class="sector-detail-card"><div class="sector-detail-card-header"><h3>Lista de Filiais</h3></div><div class="table-wrapper"><ul style="padding: 1.5rem 1.5rem 1.5rem 3rem; margin: 0; font-size: 0.9em; list-style-type: disc;">${listaFiliais}</ul></div></div>`;
+                } else {
+                     noBillingContainer.innerHTML = '';
+                }
+            }
+            
+            function displayProductAnalysisResults(data) {
+                const top20Data = data.slice(0, 20);
+                const top20Container = document.getElementById('product-top20-geral-container');
+                top20Container.innerHTML = `<h2>Maiores Saídas por SKU (Top 20)</h2>`;
+                if (top20Data.length === 0) {
+                    top20Container.innerHTML += `<div class="placeholder-card"><p>Sem dados de produtos para exibir.</p></div>`;
+                    return;
+                }
+                const tableRows = top20Data.map(item => `<tr><td>${item.codigo}</td><td>${item.skus}</td><td class="text-right">${formatNumber(item.unidades)}</td><td class="text-right">${formatNumber(item.qms)}</td><td class="text-right">${item.cx.toFixed(1).replace('.',',')}</td><td class="text-right">${item.percent.toFixed(2).replace('.', ',')}%</td><td>${item.setor}</td><td>${item.posicao}</td></tr>`).join('');
+                const totalUnidades = top20Data.reduce((sum, item) => sum + item.unidades, 0);
+                const totalCx = top20Data.reduce((sum, item) => sum + item.cx, 0);
+                const totalPercent = top20Data.reduce((sum, item) => sum + item.percent, 0);
+                top20Container.innerHTML += `<button class="copy-image-btn" data-target="#product-top20-geral-table-wrapper" data-filename="top_20_skus_geral.png"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/></svg>Copiar como Imagem</button><div class="table-responsive-wrapper" id="product-top20-geral-table-wrapper"><table id="product-top20-geral-table"><thead><tr><th>Código</th><th>SKUS</th><th class="text-right">Unidades</th><th class="text-right">QMS</th><th class="text-right">CX</th><th class="text-right">%</th><th>Setor</th><th>Posição</th></tr></thead><tbody>${tableRows}</tbody><tfoot><tr><td colspan="2"><strong>TOTAL (TOP 20)</strong></td><td class="text-right"><strong>${formatNumber(totalUnidades)}</strong></td><td></td><td class="text-right"><strong>${totalCx.toFixed(1).replace('.',',')}</strong></td><td class="text-right"><strong>${totalPercent.toFixed(2).replace('.', ',')}%</strong></td><td colspan="2"></td></tr></tfoot></table></div>`;
+            }
+
+            function displayTop20BySector(productsBySector) {
+                const container = document.getElementById('product-top20-setor-container');
+                 if (Object.keys(productsBySector).length === 0) {
+                     container.innerHTML = ``;
+                     return;
+                 }
+                container.innerHTML = `<h2>Top 20 Saídas por Setor</h2><div class="search-container"><input type="text" id="sectorSearchInput" placeholder="Pesquisar por setor..."></div>`;
+                const sortedSectors = Object.keys(productsBySector).sort((a,b) => getOrder(a) - getOrder(b));
+                const grid = document.createElement('div');
+                grid.className = 'sector-detail-grid';
+                sortedSectors.forEach((setor, index) => {
+                    const products = productsBySector[setor];
+                    const top20 = products.sort((a, b) => b.unidades - a.unidades).slice(0, 20);
+                    const tableRows = top20.map(item => `<tr><td>${item.codigo}</td><td>${item.skus}</td><td class="text-right">${formatNumber(item.unidades)}</td></tr>`).join('');
+                    const totalUnidadesSetor = products.reduce((sum, item) => sum + item.unidades, 0);
+                    const card = document.createElement('div');
+                    card.className = 'sector-detail-card';
+                    card.innerHTML = `<div class="sector-detail-card-header"><h3>Setor: ${setor}</h3><span class="toggle-icon-sector">▼</span></div><div class="sector-detail-content"><div class="table-wrapper"><button class="copy-image-btn" data-target="#sector-card-table-${index}" data-filename="top20_${setor.replace(/\s/g, '_')}.png"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/></svg>Copiar como Imagem</button><div class="table-responsive-wrapper"><table id="sector-card-table-${index}"><thead><tr><th>Código</th><th>SKU</th><th class="text-right">Unidades</th></tr></thead><tbody>${tableRows}</tbody><tfoot><tr><td colspan="2"><strong>Total do Setor</strong></td><td class="text-right"><strong>${formatNumber(totalUnidadesSetor)}</strong></td></tr></tfoot></table></div></div></div>`;
+                    card.querySelector('.sector-detail-card-header').addEventListener('click', (e) => { card.classList.toggle('open'); });
+                    grid.appendChild(card);
+                });
+                container.appendChild(grid);
+                document.getElementById('sectorSearchInput').addEventListener('input', (e) => {
+                    const searchTerm = e.target.value.toLowerCase();
+                    grid.querySelectorAll('.sector-detail-card').forEach(card => {
+                        const sectorName = card.querySelector('h3').textContent.toLowerCase();
+                        card.style.display = sectorName.includes(searchTerm) ? '' : 'none';
+                    });
+                });
+            }
+
+            function setupProductSearch(fullProductList, productSalesDetails) {
+                 if (fullProductList.length === 0) {
+                     document.getElementById('product-search-container').innerHTML = '';
+                     return;
+                 }
+                const searchInput = document.getElementById('productSearchInput');
+                const resultsContainer = document.getElementById('product-search-results-container');
+                const actionsContainer = document.getElementById('product-search-actions');
+                let debounceTimeout;
+
+                function displaySearchResults(results, isSelectionView = false) {
+                    if (results.length === 0) {
+                        resultsContainer.innerHTML = isSelectionView ? `<div class="placeholder-card"><p>Nenhum produto selecionado.</p></div>` : `<div class="placeholder-card"><p>Nenhum produto encontrado.</p></div>`;
+                        return;
+                    }
+                    const detailsButtonHTML = (item) => isReadOnlySharedView ? `<td><button class="action-btn" style="padding: 0.5rem 1rem; opacity: 0.5; cursor: not-allowed;" disabled title="Detalhes indisponíveis na vista partilhada">Ver Detalhes</button></td>` : `<td><button class="details-btn action-btn" data-code="${item.codigo}" style="padding: 0.5rem 1rem;">Ver Detalhes</button></td>`;
+                    const tableRows = results.map(item => `<tr><td class="col-select"><input type="checkbox" class="product-select" data-code="${item.codigo}" ${appState.selectedProducts.has(item.codigo) ? 'checked' : ''}></td><td>${item.codigo}</td><td>${item.skus}</td><td class="text-right">${formatNumber(item.unidades)}</td><td>${item.setor}</td><td>${item.posicao}</td>${detailsButtonHTML(item)}</tr>`).join('');
+                    resultsContainer.innerHTML = `<div class="table-responsive-wrapper"><table><thead><tr><th class="col-select"><input type="checkbox" id="select-all-visible"></th><th>Código</th><th>SKU</th><th class="text-right">Unidades</th><th>Setor</th><th>Posição</th><th>Ações</th></tr></thead><tbody>${tableRows}</tbody></table></div>`;
+                }
+                function updateSelectionActions() {
+                    if (appState.selectedProducts.size > 0) {
+                        const exportButtonsHTML = isReadOnlySharedView ? '' : `<button id="export-selected-excel-btn" class="action-btn excel">Exportar Detalhes (Excel)</button><button id="export-selected-pdf-btn" class="action-btn pdf">Exportar Detalhes (PDF)</button>`;
+                        actionsContainer.innerHTML = `<p>${appState.selectedProducts.size} produto(s) selecionado(s)</p><button id="view-selected-btn" class="action-btn" style="background-color: var(--primary-color); color: white;">Visualizar Selecionados</button>${exportButtonsHTML}<button id="clear-selection-btn" class="action-btn" style="background-color: var(--secondary-color); color: white;">Limpar Seleção</button>`;
+                        actionsContainer.classList.remove('hidden');
+                    } else {
+                        actionsContainer.classList.add('hidden');
+                    }
+                }
+                searchInput.addEventListener('input', (e) => {
+                    clearTimeout(debounceTimeout);
+                    debounceTimeout = setTimeout(() => {
+                        const searchTerms = e.target.value.trim().toUpperCase().split(/[\s,;]+/).filter(term => term.length > 0);
+                        if (searchTerms.length === 0) {
+                            resultsContainer.innerHTML = `<div class="placeholder-card"><p>A pesquisa retornará os produtos correspondentes aqui.</p></div>`; return;
+                        }
+                        if (searchTerms.length === 1 && searchTerms[0].length < 3) {
+                            resultsContainer.innerHTML = `<div class="placeholder-card"><p>Digite pelo menos 3 caracteres para pesquisar por um único item.</p></div>`; return;
+                        }
+                        const searchResults = fullProductList.filter(item => {
+                            const itemCode = item.codigo.toUpperCase();
+                            const itemSkus = item.skus.toUpperCase();
+                            return searchTerms.some(term => itemCode.includes(term) || itemSkus.includes(term));
+                        });
+                        displaySearchResults(searchResults);
+                    }, 300);
+                });
+                resultsContainer.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('details-btn')) {
+                        const productCode = e.target.getAttribute('data-code');
+                        showProductDetailsModal(fullProductList.find(p => p.codigo === productCode), productSalesDetails.get(productCode));
+                    } else if (e.target.classList.contains('product-select')) {
+                        const code = e.target.dataset.code;
+                        if (e.target.checked) appState.selectedProducts.add(code);
+                        else appState.selectedProducts.delete(code);
+                        updateSelectionActions();
+                    } else if (e.target.id === 'select-all-visible') {
+                        const checkboxes = resultsContainer.querySelectorAll('.product-select');
+                        checkboxes.forEach(cb => {
+                            cb.checked = e.target.checked;
+                            const code = cb.dataset.code;
+                            if (e.target.checked) appState.selectedProducts.add(code);
+                            else appState.selectedProducts.delete(code);
+                        });
+                        updateSelectionActions();
+                    }
+                });
+                actionsContainer.addEventListener('click', e => {
+                    if (appState.selectedProducts.size === 0) return;
+                    const selectedItems = fullProductList.filter(p => appState.selectedProducts.has(p.codigo));
+                    if (e.target.id === 'view-selected-btn') {
+                        displaySearchResults(selectedItems, true);
+                        searchInput.value = ``;
+                        searchInput.placeholder = `A visualizar ${selectedItems.length} produto(s) selecionado(s)...`;
+                    } else if (e.target.id === 'clear-selection-btn') {
+                        appState.selectedProducts.clear();
+                        searchInput.value = '';
+                        searchInput.placeholder = 'Pesquisar por um ou mais produtos (separar por vírgula, espaço ou ;)';
+                        searchInput.dispatchEvent(new Event('input'));
+                        updateSelectionActions();
+                    } else if (e.target.id === 'export-selected-excel-btn') {
+                        const sheets = selectedItems.map(item => {
+                            const details = productSalesDetails.get(item.codigo) || [];
+                            const salesByFilial = details.reduce((acc, row) => {
+                                const codigoLoja = String(row['Loja Cross'] || row['Código da Loja'] || 'N/A').trim();
+                                const storeInfo = masterStoreList.get(codigoLoja);
+                                const nomeLoja = storeInfo ? storeInfo.name : (String(row['Nome da Loja'] || '').trim() || 'N/A');
+                                const filialKey = `${codigoLoja} - ${nomeLoja}`;
+                                let rota = String(row['Rota'] || 'N/A').trim();
+                                if(storeInfo && rota === '916') rota = storeInfo.rota;
+                                const qty = parseFloat(row['Qtd'] || row['Sum Qtd Solicitada'] || row['Tot'] || 0);
+                                if(!acc[filialKey]) acc[filialKey] = { rota: rota, qtd: 0 };
+                                acc[filialKey].qtd += qty;
+                                return acc;
+                            }, {});
+                            const sortedFiliais = Object.entries(salesByFilial).sort((a,b) => b[1].qtd - a[1].qtd);
+                            const dataToExport = sortedFiliais.map(([filial, data]) => ({ 'Rota': data.rota, 'Filial': filial, 'Unidades': data.qtd }));
+                            return { name: item.codigo.substring(0, 31), data: dataToExport };
+                        });
+                        exportToExcel(sheets, 'detalhes_produtos_selecionados.xlsx');
+                    } else if (e.target.id === 'export-selected-pdf-btn') {
+                        const { jsPDF } = window.jspdf;
+                        const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
+                        let lastY = 35;
+                        doc.setFontSize(18);
+                        doc.setTextColor('#343a40');
+                        doc.text('Relatório Detalhado de Produtos Selecionados', 14, 22);
+                        selectedItems.forEach((item, index) => {
+                            const details = productSalesDetails.get(item.codigo) || [];
+                            const salesByFilial = details.reduce((acc, row) => {
+                                const codigoLoja = String(row['Loja Cross'] || row['Código da Loja'] || 'N/A').trim();
+                                const storeInfo = masterStoreList.get(codigoLoja);
+                                const nomeLoja = storeInfo ? storeInfo.name : (String(row['Nome da Loja'] || '').trim() || 'N/A');
+                                const filialKey = `${codigoLoja} - ${nomeLoja}`;
+                                let rota = String(row['Rota'] || 'N/A').trim();
+                                if(storeInfo && rota === '916') rota = storeInfo.rota;
+                                const qty = parseFloat(row['Qtd'] || row['Sum Qtd Solicitada'] || row['Tot'] || 0);
+                                if(!acc[filialKey]) acc[filialKey] = { rota: rota, qtd: 0 };
+                                acc[filialKey].qtd += qty;
+                                return acc;
+                            }, {});
+                            const sortedFiliais = Object.entries(salesByFilial).sort((a,b) => b[1].qtd - a[1].qtd);
+                            const body = sortedFiliais.map(([filial, data]) => [data.rota, filial, data.qtd]);
+                            if (index > 0) {
+                                const spaceNeeded = 15 + body.length * 7;
+                                if (lastY + spaceNeeded > 280) { doc.addPage(); lastY = 22; } else { lastY += 15; }
+                            }
+                            doc.setFontSize(12);
+                            const productColor = getComputedStyle(document.documentElement).getPropertyValue('--product-primary').trim();
+                            doc.setTextColor(productColor);
+                            doc.text(`${item.codigo} - ${item.skus}`, 14, lastY);
+                            doc.autoTable({ head: [['Rota', 'Filial', 'Unidades']], body: body, startY: lastY + 2, theme: 'grid', headStyles: { fillColor: [111, 66, 193] }, didDrawPage: (data) => { lastY = data.cursor.y; } });
+                        });
+                        doc.save('detalhes_produtos_selecionados.pdf');
+                    }
+                });
+            }
+
+            function showProductDetailsModal(productInfo, salesDetails) {
+                 const modal = document.getElementById('details-modal');
+                const salesByFilial = (salesDetails || []).reduce((acc, row) => {
+                    const codigoLoja = String(row['Loja Cross'] || row['Código da Loja'] || 'N/A').trim();
+                    const storeInfo = masterStoreList.get(codigoLoja);
+                    const nomeLoja = storeInfo ? storeInfo.name : (String(row['Nome da Loja'] || '').trim() || 'N/A');
+                    const filialKey = `${codigoLoja} - ${nomeLoja}`;
+                    let rota = String(row['Rota'] || 'N/A').trim();
+                    if(storeInfo && rota === '916') rota = storeInfo.rota;
+                    const qty = parseFloat(row['Qtd'] || row['Sum Qtd Solicitada'] || row['Tot'] || 0);
+                    if(!acc[filialKey]) acc[filialKey] = { rota: rota, qtd: 0 };
+                    acc[filialKey].qtd += qty;
+                    return acc;
+                }, {});
+                const sortedFiliais = Object.entries(salesByFilial).sort((a,b) => b[1].qtd - a[1].qtd);
+                const tableRows = sortedFiliais.map(([filial, data]) => `<tr><td>${data.rota}</td><td>${filial}</td><td class="text-right">${formatNumber(data.qtd)}</td></tr>`).join('');
+                modal.innerHTML = `<div class="modal-content"><div class="modal-header"><h3>Detalhes de Saída: ${productInfo.skus} (${productInfo.codigo})</h3><button class="modal-close-btn">&times;</button></div><div class="modal-body table-responsive-wrapper"><table><thead><tr><th>Rota</th><th>Filial</th><th class="text-right">Unidades</th></tr></thead><tbody>${tableRows}</tbody></table></div><div class="modal-footer"><button class="export-btn pdf" data-type="pdf" data-code="${productInfo.codigo}">Exportar PDF</button><button class="export-btn excel" data-type="excel" data-code="${productInfo.codigo}">Exportar Excel</button></div></div>`;
+                modal.classList.remove('hidden');
+                modal.querySelector('.modal-close-btn').addEventListener('click', () => modal.classList.add('hidden'));
+                modal.addEventListener('click', (e) => { 
+                    if (e.target === modal) modal.classList.add('hidden');
+                    else if (e.target.classList.contains('export-btn')) {
+                        const type = e.target.dataset.type;
+                        const code = e.target.dataset.code;
+                        const filename = `Detalhes_Produto_${code.replace(/\s/g, '_')}`;
+                        const title = `Detalhes de Saída: ${productInfo.skus} (${code})`;
+                        const head = ['Rota', 'Filial', 'Unidades'];
+                        const body = sortedFiliais.map(([filial, data]) => [data.rota, filial, data.qtd]);
+                        if(type === 'excel') {
+                            const dataToExport = body.map(row => ({ 'Rota': row[0], 'Filial': row[1], 'Unidades': row[2] }));
+                            exportToExcel([{ name: 'Detalhes', data: dataToExport }], `${filename}.xlsx`);
+                        } else {
+                            exportToPdf(title, head, body, `${filename}.pdf`);
+                        }
+                    }
+                });
+            }
+
+            function loadDataFromSharedObject(sharedData, isReadOnly = false) {
+                isReadOnlySharedView = isReadOnly;
+                if (sharedData.ordersData) localStorage.setItem('ordersData', JSON.stringify(sharedData.ordersData));
+                if (sharedData.nonReturnedOrders) localStorage.setItem('nonReturnedOrders', JSON.stringify(sharedData.nonReturnedOrders));
+                if (sharedData.sectorData) localStorage.setItem('sectorData', JSON.stringify(sharedData.sectorData));
+                if (sharedData.addressData) localStorage.setItem('addressData', JSON.stringify(sharedData.addressData));
+                if (sharedData.productMasterData) localStorage.setItem('productMasterData', JSON.stringify(sharedData.productMasterData));
+                if (sharedData.lastUpdateTime) localStorage.setItem('lastUpdateTime', sharedData.lastUpdateTime);
+                if (isReadOnly) UIElements.fileControl.panel.classList.add('hidden');
+                loadDataFromStorage();
+            }
+
+            function loadDataFromStorage() {
+                const ordersData = JSON.parse(localStorage.getItem('ordersData'));
+                const nonReturnedOrdersArray = JSON.parse(localStorage.getItem('nonReturnedOrders'));
+                const sectorData = JSON.parse(localStorage.getItem('sectorData'));
+                const addressDataArray = JSON.parse(localStorage.getItem('addressData'));
+                const productMasterDataArray = JSON.parse(localStorage.getItem('productMasterData'));
+                const savedTimestamp = localStorage.getItem('lastUpdateTime');
+                let dataLoaded = false;
+                if (ordersData) { appState.ordersData = ordersData; UIElements.dropAreas.orders.classList.add('loaded'); dataLoaded = true; }
+                if (nonReturnedOrdersArray) { appState.nonReturnedOrders = new Set(nonReturnedOrdersArray); UIElements.dropAreas.status.classList.add('loaded'); dataLoaded = true; }
+                if (sectorData) { appState.sectorData = sectorData; UIElements.dropAreas.sector.classList.add('loaded'); dataLoaded = true; }
+                if (addressDataArray) { appState.addressData = new Map(addressDataArray); UIElements.dropAreas.address.classList.add('loaded'); dataLoaded = true; }
+                if (productMasterDataArray) { appState.productMasterData = new Map(productMasterDataArray); UIElements.dropAreas.productMaster.classList.add('loaded'); dataLoaded = true; }
+                if (savedTimestamp) updateTimestamp(savedTimestamp);
+                if (dataLoaded) {
+                    showNotification('Dados da sessão anterior carregados.', 'success');
+                    UIElements.containers.actions.classList.remove('hidden');
+                    runAllAnalyses();
+                    autoClosePanel();
+                }
+            }
+            
+            async function saveAnalysisToFirebase() {
+                if (!db || !auth.currentUser) {
+                    showNotification("Serviço de partilha indisponível ou utilizador não autenticado.", "error");
+                    return;
+                }
+                if (!appState.processedData.sectorAnalysis || !appState.processedData.productAnalysis) {
+                    showNotification('Execute pelo menos uma análise antes de partilhar.', 'error');
+                    return;
+                }
+                const lastId = localStorage.getItem('lastSharedAnalysisId');
+                
+                const performShare = async (mode, existingId = null) => {
+                    UIElements.loader.classList.remove('hidden');
+                    try {
+                        let analysisId = existingId;
+                        
+                        const { sectorAnalysis, productAnalysis } = appState.processedData;
+                        const manifestData = {
+                            totalQuantidadeGeral: sectorAnalysis.totalQuantidadeGeral,
+                            totalSkusGeral: sectorAnalysis.totalSkusGeral,
+                            totalUniqueFiliais: sectorAnalysis.totalUniqueFiliais,
+                            filiaisSemFaturamento: sectorAnalysis.filiaisSemFaturamento || [],
+                            lastUpdateTime: localStorage.getItem('lastUpdateTime') || new Date().toISOString(),
+                            createdAt: new Date().toISOString(),
+                            userId: auth.currentUser.uid
+                        };
+                        
+                        if (mode === 'create_new') {
+                             const newDocRef = doc(collection(db, "shared_analyses"));
+                             analysisId = newDocRef.id;
+                        }
+
+                        const manifestDocRef = doc(db, "shared_analyses", analysisId);
+                        await setDoc(manifestDocRef, manifestData, { merge: mode === 'update' });
+                        showNotification('Manifesto da análise guardado. A enviar dados...', 'warning');
+
+                        if (mode === 'update' && existingId) {
+                            showNotification('A apagar dados antigos da partilha...', 'warning');
+                            const subcollections = ['sector_details', 'filial_details', 'data_chunks'];
+                            for (const sub of subcollections) {
+                                const subRef = collection(db, "shared_analyses", existingId, sub);
+                                const snapshot = await getDocs(subRef);
+                                if (snapshot.empty) continue;
+
+                                const deleteBatch = writeBatch(db);
+                                snapshot.forEach(doc => deleteBatch.delete(doc.ref));
+                                await deleteBatch.commit();
+                            }
+                        }
+
+                        showNotification('A enviar detalhes da análise...', 'warning');
+                        const allBatches = [];
+                        let batch = writeBatch(db);
+                        let operationCount = 0;
+
+                        const commitBatchIfNeeded = () => {
+                            if (operationCount >= 499) {
+                                allBatches.push(batch.commit());
+                                batch = writeBatch(db);
+                                operationCount = 0;
+                            }
+                        };
+
+                        const { setoresData, filialData } = sectorAnalysis;
+                        const sectorDetailsRef = collection(db, "shared_analyses", analysisId, "sector_details");
+                        for (const [setor, data] of setoresData.entries()) {
+                             const docData = {
+                                totalQtd: data.totalQtd,
+                                totalLabels: data.totalLabels,
+                                labelsByRoute: Array.from(data.labelsByRoute.entries()),
+                                productCount: data.products.size
+                            };
+                            const sanitizedSectorName = setor.replace(/[.\/\[\]*$#]/g, '_');
+                            const newDocRef = doc(sectorDetailsRef, sanitizedSectorName);
+                            batch.set(newDocRef, docData);
+                            operationCount++;
+                            commitBatchIfNeeded();
+                        }
+                        
+                        const filialDetailsRef = collection(db, "shared_analyses", analysisId, "filial_details");
+                        for (const [rota, filiais] of filialData.entries()) {
+                             const filiaisArray = Array.from(filiais.entries()).map(([filial, unidades]) => ({ filial, unidades }));
+                             if(filiaisArray.length > 0) {
+                                const sanitizedRota = rota.replace(/[.\/\[\]*$#]/g, '_');
+                                const newDocRef = doc(filialDetailsRef, sanitizedRota);
+                                batch.set(newDocRef, { filiais: filiaisArray });
+                                operationCount++;
+                                commitBatchIfNeeded();
+                             }
+                        }
+
+                        const { analysisData } = productAnalysis;
+                        const dataChunksRef = collection(db, "shared_analyses", analysisId, "data_chunks");
+                        const chunkSize = 2000;
+                        for (let i = 0; i < analysisData.length; i += chunkSize) {
+                            const chunk = analysisData.slice(i, i + chunkSize);
+                            const newDocRef = doc(dataChunksRef);
+                            batch.set(newDocRef, { chunkIndex: i / chunkSize, data: chunk });
+                            operationCount++;
+                            commitBatchIfNeeded();
+                        }
+                        
+                        if(operationCount > 0) allBatches.push(batch.commit());
+                        await Promise.all(allBatches);
+
+                        localStorage.setItem('lastSharedAnalysisId', analysisId);
+                        const shareUrl = `${window.location.origin}${window.location.pathname}?analysis=${analysisId}`;
+                        showShareLinkModal(shareUrl);
+                    } catch (error) {
+                        console.error("Error saving analysis to Firebase:", error);
+                        let errorMessage = "Erro ao guardar a análise para partilha.";
+                        if (error.code === 'permission-denied') errorMessage = "Erro de permissão. Verifique as regras de segurança do Firestore para permitir escritas.";
+                        else errorMessage += " Verifique a console para mais detalhes técnicos.";
+                        showNotification(errorMessage, "error", 10000);
+                    } finally {
+                        UIElements.loader.classList.add('hidden');
+                    }
+                };
+                
+                if (lastId) {
+                    const modal = document.getElementById('update-share-modal');
+                    modal.classList.remove('hidden');
+                    document.getElementById('create-new-share-btn').onclick = () => { modal.classList.add('hidden'); performShare('create_new'); };
+                    document.getElementById('update-existing-share-btn').onclick = () => { modal.classList.add('hidden'); performShare('update', lastId); };
+                } else {
+                    performShare('create_new');
+                }
+            }
+            
+            function showShareLinkModal(url) {
+                const modal = document.getElementById('share-link-modal');
+                const urlInput = document.getElementById('share-link-input');
+                const copyBtn = document.getElementById('copy-link-btn');
+                const originalBtnContent = copyBtn.innerHTML;
+                
+                urlInput.value = url;
+                modal.classList.remove('hidden');
+                
+                modal.querySelector('.modal-close-btn').onclick = () => modal.classList.add('hidden');
+                modal.onclick = (e) => { if (e.target === modal) modal.classList.add('hidden'); };
+                
+                copyBtn.onclick = () => {
+                    urlInput.select();
+                    urlInput.setSelectionRange(0, 99999);
+                    navigator.clipboard.writeText(urlInput.value);
+                    showNotification('Link copiado para a área de transferência!', 'success');
+                    copyBtn.textContent = 'Copiado!';
+                    setTimeout(() => { copyBtn.innerHTML = originalBtnContent; }, 2000);
+                };
+            }
+
+            async function loadAnalysisFromFirebase(analysisId) {
+                isReadOnlySharedView = true;
+                if (!db) { showNotification("Serviço de partilha indisponível.", "error"); return; }
+                UIElements.loader.classList.remove('hidden');
+                try {
+                    const manifestDocRef = doc(db, "shared_analyses", analysisId);
+                    const manifestSnap = await getDoc(manifestDocRef);
+                    if (!manifestSnap.exists()) { 
+                        showNotification("Análise não encontrada.", "error"); 
+                        UIElements.loader.classList.add('hidden');
+                        return;
+                    }
+                    const manifestData = manifestSnap.data();
+
+                    const sectorDetailsRef = collection(db, "shared_analyses", analysisId, "sector_details");
+                    const filialDetailsRef = collection(db, "shared_analyses", analysisId, "filial_details");
+                    const dataChunksRef = collection(db, "shared_analyses", analysisId, "data_chunks");
+                    const [sectorSnapshot, filialSnapshot, dataSnapshot] = await Promise.all([ getDocs(sectorDetailsRef), getDocs(filialDetailsRef), getDocs(dataChunksRef) ]);
+
+                    const setoresData = new Map();
+                    sectorSnapshot.forEach(doc => {
+                        const setor = doc.id.replace(/_/g, '/');
+                        const data = doc.data();
+                        
+                        const labelsByRoute = new Map(data.labelsByRoute || []);
+
+                        setoresData.set(setor, {
+                            totalQtd: data.totalQtd,
+                            products: new Map(), // Será preenchido pelos chunks de produtos gerais
+                            totalLabels: data.totalLabels,
+                            labelsByRoute: labelsByRoute
+                        });
+                    });
+
+                    const filialData = new Map();
+                    filialSnapshot.forEach(doc => {
+                        const rota = doc.id.replace(/_/g, '/');
+                        const data = doc.data();
+                        if (!filialData.has(rota)) filialData.set(rota, new Map());
+                        const filiaisMap = filialData.get(rota);
+                        if (data.filiais && Array.isArray(data.filiais)) {
+                            data.filiais.forEach(filialInfo => filiaisMap.set(filialInfo.filial, filialInfo.unidades));
+                        }
+                    });
+                    
+                    let allAnalysisData = [];
+                    if (!dataSnapshot.empty) {
+                        const sortedChunks = dataSnapshot.docs.map(doc => doc.data()).sort((a, b) => a.chunkIndex - b.chunkIndex);
+                        sortedChunks.forEach(chunk => allAnalysisData = allAnalysisData.concat(chunk.data));
+                    }
+                    
+                    allAnalysisData.forEach(item => {
+                         const setor = item.setor;
+                         if (setor && setoresData.has(setor)) {
+                            const setorInfo = setoresData.get(setor);
+                            const productInfo = setorInfo.products.get(item.codigo) || { descr: item.skus, totalQtd: 0 };
+                            productInfo.totalQtd += item.unidades;
+                            setorInfo.products.set(item.codigo, productInfo);
+                         }
+                    });
+
+                    const sectorAnalysis = { setoresData, filialData, totalQuantidadeGeral: manifestData.totalQuantidadeGeral, totalSkusGeral: manifestData.totalSkusGeral, totalUniqueFiliais: manifestData.totalUniqueFiliais, filiaisSemFaturamento: manifestData.filiaisSemFaturamento || [] };
+                    const productAnalysis = { analysisData: allAnalysisData, productSalesDetails: new Map() };
+
+                    appState.processedData.sectorAnalysis = sectorAnalysis;
+                    appState.processedData.productAnalysis = productAnalysis;
+                    
+                    UIElements.containers.initialPlaceholder.classList.add('hidden');
+                    UIElements.containers.fullAnalysis.classList.remove('hidden');
+                    document.getElementById('file-control-panel').classList.add('hidden');
+                    
+                    UIElements.sections.validation.classList.add('hidden');
+                    UIElements.sections.generalSummary.classList.remove('hidden');
+                    UIElements.sections.sector.classList.remove('hidden');
+                    UIElements.sections.label.classList.remove('hidden');
+                    UIElements.sections.filial.classList.remove('hidden');
+                    UIElements.sections.noBilling.classList.remove('hidden');
+                    UIElements.sections.product.classList.remove('hidden');
+
+                    UIElements.containers.sectorSummary.innerHTML = `
+                        <div class="geral-summary-grid">
+                            <div class="geral-summary-card"><div class="icon sector"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg></div><div class="info"><p>Quantidade Total</p><div class="value">${formatNumber(sectorAnalysis.totalQuantidadeGeral)}</div></div></div>
+                            <div class="geral-summary-card"><div class="icon skus"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4"/><path d="M12 20v2"/><path d="M5 12H3"/><path d="M21 12h-2"/><path d="m18.36 5.64-.18-.18"/><path d="m5.82 18.18-.18-.18"/><path d="m18.18 18.18-.18.18"/><path d="m5.64 5.64-.18.18"/></svg></div><div class="info"><p>Total de SKUs Analisados</p><div class="value">${formatNumber(sectorAnalysis.totalSkusGeral)}</div></div></div>
+                        </div>`;
+
+                    displaySectorResults(sectorAnalysis);
+                    displayProductAnalysisResults(productAnalysis.analysisData);
+                    const productsBySector = productAnalysis.analysisData.reduce((acc, product) => {
+                        const sector = product.setor || 'N/A';
+                        if (!acc[sector]) acc[sector] = [];
+                        acc[sector].push(product);
+                        return acc;
+                    }, {});
+                    displayTop20BySector(productsBySector);
+                    setupProductSearch(productAnalysis.analysisData, productAnalysis.productSalesDetails);
+                    
+                    showNotification('Análise partilhada carregada.', 'success');
+                    if (manifestData.lastUpdateTime) updateTimestamp(manifestData.lastUpdateTime);
+                    
+                } catch (error) {
+                    console.error("Error loading analysis from Firebase:", error);
+                    showNotification("Erro ao carregar a análise partilhada.", "error");
+                } finally {
+                    UIElements.loader.classList.add('hidden');
+                }
+            }
+
+            function exportToExcel(sheets, filename = 'relatorio.xlsx') {
+                try {
+                    const workbook = XLSX.utils.book_new();
+                    sheets.forEach(sheetInfo => {
+                        if (!sheetInfo.data || sheetInfo.data.length === 0) return;
+                        
+                        const header = Object.keys(sheetInfo.data[0]);
+                        const aoa = [header, ...sheetInfo.data.map(row => header.map(key => row[key]))];
+                        const worksheet = XLSX.utils.aoa_to_sheet(aoa);
+
+                        const colWidths = header.map((h, i) => ({
+                            wch: Math.max(h.length, ...sheetInfo.data.map(row => String(row[h] || '').length)) + 2
+                        }));
+                        worksheet['!cols'] = colWidths;
+                        
+                        XLSX.utils.book_append_sheet(workbook, worksheet, sheetInfo.name);
+                    });
+
+                    if (workbook.SheetNames.length > 0) {
+                        XLSX.writeFile(workbook, filename);
+                        showNotification(`Ficheiro Excel "${filename}" descarregado!`, 'success');
+                    } else {
+                        showNotification('Nenhum dado para exportar.', 'warning');
+                    }
+                } catch (error) {
+                    console.error("Erro ao exportar para Excel:", error);
+                    showNotification('Falha ao gerar o ficheiro Excel.', 'error');
+                }
+            }
+
+            function exportToPdf(title, head, body, filename) {
+                try {
+                    showNotification('A gerar PDF...', 'warning', 2000);
+                    const { jsPDF } = window.jspdf;
+                    const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
+
+                    doc.setFontSize(18);
+                    doc.setTextColor('#343a40');
+                    doc.text(title, 14, 22);
+
+                    doc.autoTable({
+                        head: [head],
+                        body: body,
+                        startY: 35,
+                        theme: 'grid',
+                        headStyles: { fillColor: [111, 66, 193] },
+                    });
+
+                    doc.save(filename);
+                    showNotification(`Ficheiro PDF "${filename}" descarregado!`, 'success');
+                } catch(error) {
+                        console.error("Erro ao gerar PDF:", error);
+                        showNotification('Falha ao gerar o ficheiro PDF.', 'error');
+                }
+            }
+            
+            function initializeEventListeners() {
+                UIElements.fileControl.header.addEventListener('click', () => {
+                    UIElements.fileControl.panel.classList.toggle('open');
+                    UIElements.fileControl.icon.textContent = UIElements.fileControl.panel.classList.contains('open') ? '▲' : '▼';
+                });
+                Object.keys(UIElements.dropAreas).forEach(key => setupFileDropArea(UIElements.dropAreas[key], UIElements.inputs[key]));
+                UIElements.inputs.orders.addEventListener('change', handleOrdersFile);
+                UIElements.inputs.status.addEventListener('change', handleStatusFile);
+                UIElements.inputs.sector.addEventListener('change', handleSectorFile);
+                UIElements.inputs.address.addEventListener('change', handleAddressFile);
+                UIElements.inputs.productMaster.addEventListener('change', handleProductMasterFile);
+                UIElements.inputs.sharedFile.addEventListener('change', handleSharedFile);
+                UIElements.buttons.reloadFiles.addEventListener('click', () => {
+                    Object.keys(localStorage).forEach(key => localStorage.removeItem(key));
+                    window.location.href = window.location.href.split('?')[0];
+                });
+                if (UIElements.buttons.shareOnline) {
+                    UIElements.buttons.shareOnline.addEventListener('click', saveAnalysisToFirebase);
+                }
+                document.body.addEventListener('click', e => {
+                    const copyImageButton = e.target.closest('.copy-image-btn');
+                    if (copyImageButton) {
+                        const targetSelector = copyImageButton.dataset.target;
+                        const filename = copyImageButton.dataset.filename || 'relatorio.png';
+                        const elementToCopy = document.querySelector(targetSelector);
+                        if (!elementToCopy) { showNotification('Erro: Elemento do relatório não encontrado.', 'error'); return; }
+                        showNotification('A gerar imagem...', 'warning', 2000);
+                        html2canvas(elementToCopy, { scale: 2, backgroundColor: '#ffffff', useCORS: true })
+                            .then(canvas => {
+                                const link = document.createElement('a');
+                                link.download = filename;
+                                link.href = canvas.toDataURL('image/png');
+                                link.click();
+                                showNotification('Imagem descarregada!', 'success');
+                            }).catch(err => { console.error("Erro do html2canvas:", err); showNotification('Falha ao gerar a imagem.', 'error'); });
+                    }
+                });
+                if (UIElements.buttons.exportData) {
+                    UIElements.buttons.exportData.addEventListener('click', () => {
+                        const dataToShare = { ordersData: appState.ordersData, nonReturnedOrders: Array.from(appState.nonReturnedOrders), sectorData: appState.sectorData, addressData: Array.from(appState.addressData.entries()), productMasterData: Array.from(appState.productMasterData.entries()), lastUpdateTime: localStorage.getItem('lastUpdateTime') };
+                        const blob = new Blob([JSON.stringify(dataToShare)], {type: 'application/json'});
+                        const url = URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.href = url;
+                        link.download = 'relatorio-partilhado.json';
+                        link.click();
+                        URL.revokeObjectURL(url);
+                        showNotification('Ficheiro de partilha (.json) descarregado!', 'success');
+                    });
+                }
+                if (UIElements.buttons.dailyReport) {
+                    UIElements.buttons.dailyReport.addEventListener('click', () => {
+                        if (!appState.processedData.sectorAnalysis || !appState.processedData.productAnalysis) { showNotification('Carregue as planilhas de Itens e Endereços para gerar o relatório.', 'error'); return; }
+                        showNotification('A gerar relatório diário...', 'warning', 2000);
+                        const sheets = [];
+                        const { filialData } = appState.processedData.sectorAnalysis;
+                        const faturamentoPorRota = new Map();
+                        for (const [rota, filiais] of filialData.entries()) faturamentoPorRota.set(rota, [...filiais.values()].reduce((a, b) => a + b, 0));
+                        const rotaData = Array.from(faturamentoPorRota.entries()).map(([rota, unidades]) => ({'Rota': rota, 'Total Unidades': unidades})).sort((a,b) => Number(a.Rota) - Number(b.Rota));
+                        if(rotaData.length > 0) sheets.push({ name: 'Faturamento por Rota', data: rotaData });
+                        const { setoresData } = appState.processedData.sectorAnalysis;
+                        const setorData = [...setoresData.entries()].map(([setor, data]) => ({'Setor': setor, 'Total Unidades': data.totalQtd, 'Total SKUs': data.products.size})).sort((a,b) => getOrder(a.Setor) - getOrder(b.Setor));
+                        if(setorData.length > 0) sheets.push({ name: 'Faturamento por Setor', data: setorData });
+                        const { analysisData } = appState.processedData.productAnalysis;
+                        const top50SKUs = analysisData.slice(0, 50).map(item => ({ 'Código': item.codigo, 'SKU': item.skus, 'Unidades': item.unidades, 'Caixas (QMS)': parseFloat(item.cx.toFixed(2)), 'Setor': item.setor, 'Posição': item.posicao }));
+                        if(top50SKUs.length > 0) sheets.push({ name: 'Top 50 SKUs', data: top50SKUs });
+                        const today = new Date().toISOString().slice(0, 10);
+                        exportToExcel(sheets, `Relatorio_Diario_${today}.xlsx`);
+                    });
+                }
+            }
+
+            document.addEventListener('DOMContentLoaded', () => {
+                initializeEventListeners();
+                const urlParams = new URLSearchParams(window.location.search);
+                const analysisId = urlParams.get('analysis');
+                if (analysisId) {
+                    setTimeout(() => { loadAnalysisFromFirebase(analysisId); }, 500);
+                } else {
+                    loadDataFromStorage();
+                }
+            });
+        })();
+    </script>
+</body>
+</html>
+
