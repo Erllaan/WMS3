@@ -251,14 +251,13 @@
         #sector-analysis-table .col-skus,
         #sector-analysis-table .col-percent { text-align: right; font-weight: 500; width: 20%; }
         
-        /* === ESTILOS ATUALIZADOS PARA TABELA DE ETIQUETAS === */
         #label-analysis-table th:first-child,
         #label-analysis-table td:first-child {
             text-align: left;
             font-weight: 600;
-            position: sticky; /* Trava a primeira coluna */
+            position: sticky;
             left: 0;
-            background-color: #f8f9fa; /* Fundo para a coluna travada */
+            background-color: #f8f9fa;
         }
         #label-analysis-table tbody td:first-child {
              background-color: var(--card-background);
@@ -1530,7 +1529,7 @@
                              const docData = {
                                 totalQtd: data.totalQtd,
                                 totalLabels: data.totalLabels,
-                                labelsByRoute: Array.from(data.labelsByRoute.entries()),
+                                labelsByRoute: Object.fromEntries(data.labelsByRoute), // CORRIGIDO
                                 productCount: data.products.size
                             };
                             const sanitizedSectorName = setor.replace(/[.\/\[\]*$#]/g, '_');
@@ -1636,7 +1635,7 @@
                         const setor = doc.id.replace(/_/g, '/');
                         const data = doc.data();
                         
-                        const labelsByRoute = new Map(data.labelsByRoute || []);
+                        const labelsByRoute = new Map(Object.entries(data.labelsByRoute || {})); // CORRIGIDO
 
                         setoresData.set(setor, {
                             totalQtd: data.totalQtd,
