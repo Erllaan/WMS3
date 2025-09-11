@@ -155,12 +155,13 @@
         
         table { width: 100%; border-collapse: collapse; background: #fff; border-radius: var(--border-radius); overflow: hidden; box-shadow: var(--shadow); }
         
+        /* === ESTILOS DE TABELA MAIS COMPACTOS AINDA (MELHORIA) === */
         th, td {
-            padding: 0.5rem 0.75rem;
+            padding: 0.35rem 0.75rem; /* Espaçamento vertical ainda mais reduzido */
             text-align: left;
             border-bottom: 1px solid #f1f3f5;
             white-space: nowrap;
-            font-size: 0.8em;
+            font-size: 0.78em; /* Fonte ligeiramente menor para compactar */
             vertical-align: middle;
         }
 
@@ -225,14 +226,14 @@
         #file-control-content h4:not(:first-child) { margin-top: 1.5rem; }
 
         .rota-accordion-item { border: 1px solid var(--border-color); border-radius: var(--border-radius); margin-bottom: 0.75rem; overflow: hidden; background-color: var(--card-background); box-shadow: var(--shadow); }
-        .rota-accordion-header { display: flex; justify-content: space-between; align-items: flex-start; padding: 0.75rem 1.25rem; cursor: pointer; background-color: #f8f9fa; transition: background-color 0.2s; border-bottom: 1px solid transparent; flex-direction: column; gap: 0.25rem; position: relative; }
+        .rota-accordion-header { display: flex; justify-content: space-between; align-items: flex-start; padding: 0.6rem 1.25rem; /* Mais compacto */ cursor: pointer; background-color: #f8f9fa; transition: background-color 0.2s; border-bottom: 1px solid transparent; flex-direction: column; gap: 0.25rem; position: relative; }
         .rota-accordion-item.open .rota-accordion-header { border-bottom-color: var(--border-color); }
         .rota-accordion-header:hover { background-color: #e9ecef; }
-        .rota-accordion-header h2 { margin: 0; font-size: 1.1em; color: var(--primary-color); border: none; padding: 0; padding-right: 2rem; }
-        .rota-accordion-header .rota-summary-info { font-weight: 600; color: var(--text-color); font-size: 0.85em; text-align: left; display: flex; flex-direction: column; gap: 0.25rem; }
+        .rota-accordion-header h2 { margin: 0; font-size: 1.05em; color: var(--primary-color); border: none; padding: 0; padding-right: 2rem; }
+        .rota-accordion-header .rota-summary-info { font-weight: 600; color: var(--text-color); font-size: 0.8em; text-align: left; display: flex; flex-direction: column; gap: 0.1rem; }
         .rota-accordion-header .rota-summary-info span { margin-left: 0; }
         .rota-accordion-header .rota-summary-info span:nth-child(2) { display: none; }
-        .rota-accordion-header .toggle-icon-rota { font-size: 1.4em; transition: transform 0.3s ease; font-weight: bold; color: var(--primary-color); position: absolute; top: 0.75rem; right: 1.25rem; }
+        .rota-accordion-header .toggle-icon-rota { font-size: 1.4em; transition: transform 0.3s ease; font-weight: bold; color: var(--primary-color); position: absolute; top: 0.6rem; right: 1.25rem; }
         .rota-accordion-item:not(.open) .rota-accordion-header .toggle-icon-rota { transform: rotate(-90deg); }
         .rota-accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out; }
         .rota-accordion-item.open .rota-accordion-content { max-height: 2000px; transition: max-height 0.6s ease-in; }
@@ -1189,7 +1190,7 @@
                         const sortedFiliais = [...filiaisDaRota.entries()].sort((a, b) => b[1] - a[1]);
                         const totalRota = sortedFiliais.reduce((sum, [, qtd]) => sum + qtd, 0);
                         const filialRows = sortedFiliais.map(([filial, qtd]) => `<tr><td>${filial}</td><td>${formatNumber(qtd)}</td><td>${(totalRota > 0 ? (qtd / totalRota) * 100 : 0).toFixed(0)}%</td></tr>`).join('');
-                        return `<div class="rota-accordion-item"><div class="rota-accordion-header"><h2>Rota: ${rota}</h2><div class="rota-summary-info"><span>${sortedFiliais.length} Filial(is)</span><span>|</span><span>${formatNumber(totalRota)} Unidades</span></div><span class="toggle-icon-rota">▼</span></div><div class="rota-accordion-content"><div class="content-wrapper table-responsive-wrapper"><button class="copy-image-btn" data-target="#filial-table-${index}" data-filename="faturamento_rota_${rota}.png" style="margin-bottom: 1rem;">Copiar como Imagem</button><table id="filial-table-${index}"><thead><tr><th>Filial</th><th>Unidades</th><th>% da Rota</th></tr></thead><tbody>${filialRows}</tbody><tfoot><tr><td><strong>Total Rota</strong></td><td><strong>${formatNumber(totalRota)}</strong></td><td><strong>100%</strong></td></tr></tfoot></table></div></div></div>`;
+                        return `<div class="rota-accordion-item"><div class="rota-accordion-header"><h2>Rota: ${rota}</h2><div class="rota-summary-info"><span>${sortedFiliais.length} Filial(is)</span><span>|</span><span>${formatNumber(totalRota)} Unidades</span></div><span class="toggle-icon-rota">▼</span></div><div class="rota-accordion-content"><div id="filial-wrapper-${index}" class="content-wrapper table-responsive-wrapper"><button class="copy-image-btn" data-target="#filial-wrapper-${index}" data-filename="faturamento_rota_${rota}.png" style="margin-bottom: 1rem;">Copiar como Imagem</button><table id="filial-table-${index}"><thead><tr><th>Filial</th><th>Unidades</th><th>% da Rota</th></tr></thead><tbody>${filialRows}</tbody><tfoot><tr><td><strong>Total Rota</strong></td><td><strong>${formatNumber(totalRota)}</strong></td><td><strong>100%</strong></td></tr></tfoot></table></div></div></div>`;
                     }).join('');
                     filialContainer.innerHTML = `<h2>Faturamento por Filiais</h2><div class="summary-card"><h2>Resumo de Filiais</h2><p>${formatNumber(totalUniqueFiliais)} filiais faturaram no período.</p></div><div id="filial-accordion-container">${filialAccordionsHTML}</div>`;
                     filialContainer.querySelectorAll('.rota-accordion-header').forEach(header => header.addEventListener('click', () => header.parentElement.classList.toggle('open')));
@@ -1237,7 +1238,7 @@
                     const totalUnidadesSetor = products.reduce((sum, item) => sum + item.unidades, 0);
                     const card = document.createElement('div');
                     card.className = 'sector-detail-card';
-                    card.innerHTML = `<div class="sector-detail-card-header"><h3>Setor: ${setor}</h3><span class="toggle-icon-sector">▼</span></div><div class="sector-detail-content"><div class="table-wrapper"><button class="copy-image-btn" data-target="#sector-card-table-${index}" data-filename="top20_${setor.replace(/\s/g, '_')}.png"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/></svg>Copiar como Imagem</button><div class="table-responsive-wrapper"><table id="sector-card-table-${index}"><thead><tr><th>Código</th><th>SKU</th><th class="text-right">Unidades</th></tr></thead><tbody>${tableRows}</tbody><tfoot><tr><td colspan="2"><strong>Total do Setor</strong></td><td class="text-right"><strong>${formatNumber(totalUnidadesSetor)}</strong></td></tr></tfoot></table></div></div></div>`;
+                    card.innerHTML = `<div class="sector-detail-card-header"><h3>Setor: ${setor}</h3><span class="toggle-icon-sector">▼</span></div><div class="sector-detail-content"><div id="sector-card-wrapper-${index}" class="table-wrapper"><button class="copy-image-btn" data-target="#sector-card-wrapper-${index}" data-filename="top20_${setor.replace(/\s/g, '_')}.png"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/></svg>Copiar como Imagem</button><div class="table-responsive-wrapper"><table id="sector-card-table-${index}"><thead><tr><th>Código</th><th>SKU</th><th class="text-right">Unidades</th></tr></thead><tbody>${tableRows}</tbody><tfoot><tr><td colspan="2"><strong>Total do Setor</strong></td><td class="text-right"><strong>${formatNumber(totalUnidadesSetor)}</strong></td></tr></tfoot></table></div></div></div>`;
                     card.querySelector('.sector-detail-card-header').addEventListener('click', (e) => { card.classList.toggle('open'); });
                     grid.appendChild(card);
                 });
@@ -1529,7 +1530,7 @@
                              const docData = {
                                 totalQtd: data.totalQtd,
                                 totalLabels: data.totalLabels,
-                                labelsByRoute: Object.fromEntries(data.labelsByRoute), // CORRIGIDO
+                                labelsByRoute: Object.fromEntries(data.labelsByRoute), // CORRIGIDO PARA OBJETO
                                 productCount: data.products.size
                             };
                             const sanitizedSectorName = setor.replace(/[.\/\[\]*$#]/g, '_');
@@ -1635,7 +1636,7 @@
                         const setor = doc.id.replace(/_/g, '/');
                         const data = doc.data();
                         
-                        const labelsByRoute = new Map(Object.entries(data.labelsByRoute || {})); // CORRIGIDO
+                        const labelsByRoute = new Map(Object.entries(data.labelsByRoute || {})); // CORRIGIDO PARA OBJETO
 
                         setoresData.set(setor, {
                             totalQtd: data.totalQtd,
@@ -1793,24 +1794,48 @@
                 if (UIElements.buttons.shareOnline) {
                     UIElements.buttons.shareOnline.addEventListener('click', saveAnalysisToFirebase);
                 }
+                
                 document.body.addEventListener('click', e => {
                     const copyImageButton = e.target.closest('.copy-image-btn');
                     if (copyImageButton) {
                         const targetSelector = copyImageButton.dataset.target;
                         const filename = copyImageButton.dataset.filename || 'relatorio.png';
                         const elementToCopy = document.querySelector(targetSelector);
-                        if (!elementToCopy) { showNotification('Erro: Elemento do relatório não encontrado.', 'error'); return; }
+                        
+                        if (!elementToCopy) { 
+                            showNotification('Erro: Elemento do relatório não encontrado.', 'error');
+                            return; 
+                        }
+
+                        copyImageButton.style.visibility = 'hidden'; 
                         showNotification('A gerar imagem...', 'warning', 2000);
-                        html2canvas(elementToCopy, { scale: 2, backgroundColor: '#ffffff', useCORS: true })
+                        
+                        const options = {
+                            scale: 2,
+                            backgroundColor: '#ffffff',
+                            useCORS: true,
+                            width: elementToCopy.clientWidth,
+                            height: elementToCopy.clientHeight,
+                            scrollX: -elementToCopy.scrollLeft,
+                            scrollY: -elementToCopy.scrollTop
+                        };
+
+                        html2canvas(elementToCopy, options)
                             .then(canvas => {
                                 const link = document.createElement('a');
                                 link.download = filename;
                                 link.href = canvas.toDataURL('image/png');
                                 link.click();
                                 showNotification('Imagem descarregada!', 'success');
-                            }).catch(err => { console.error("Erro do html2canvas:", err); showNotification('Falha ao gerar a imagem.', 'error'); });
+                            }).catch(err => { 
+                                console.error("Erro do html2canvas:", err); 
+                                showNotification('Falha ao gerar a imagem.', 'error'); 
+                            }).finally(() => {
+                                copyImageButton.style.visibility = 'visible'; 
+                            });
                     }
                 });
+
                 if (UIElements.buttons.exportData) {
                     UIElements.buttons.exportData.addEventListener('click', () => {
                         const dataToShare = { ordersData: appState.ordersData, nonReturnedOrders: Array.from(appState.nonReturnedOrders), sectorData: appState.sectorData, addressData: Array.from(appState.addressData.entries()), productMasterData: Array.from(appState.productMasterData.entries()), lastUpdateTime: localStorage.getItem('lastUpdateTime') };
