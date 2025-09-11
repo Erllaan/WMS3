@@ -155,7 +155,6 @@
         
         table { width: 100%; border-collapse: collapse; background: #fff; border-radius: var(--border-radius); overflow: hidden; box-shadow: var(--shadow); }
         
-        /* === ESTILOS DE TABELA MAIS COMPACTOS AINDA (MELHORIA) === */
         th, td {
             padding: 0.35rem 0.75rem; /* Espaçamento vertical ainda mais reduzido */
             text-align: left;
@@ -376,13 +375,15 @@
     <div class="container">
         <div id="loader" class="loader-overlay hidden"><div class="loader-spinner"></div>A processar...</div>
 
+        <div id="last-updated-container" class="hidden"></div>
+        
         <div id="file-control-panel" class="content-section open">
             <div id="file-control-header">
                 <h3>Painel de Ficheiros</h3>
                 <span class="toggle-icon">▲</span>
             </div>
             <div id="file-control-content">
-                <div id="last-updated-container" class="hidden"></div>
+                
                 <h4>Carregar Planilhas</h4>
                 <div class="file-inputs-container">
                     <label for="ordersFileInput" id="ordersFileInputArea" class="file-drop-area">
