@@ -4,10 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard WMS Multifuncional</title>
-    <!-- Bibliotecas para processamento de dados e relatórios -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <!-- BIBLIOTECAS PDF ATUALIZADAS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
     
@@ -62,8 +60,7 @@
             align-items: center;
             gap: 1rem;
         }
-        
-.main-header h1 {
+        .main-header h1 {
             font-size: 1.5em;
             font-weight: 600;
             color: var(--text-color);
@@ -365,40 +362,33 @@
         </div>
 
         <div id="full-analysis-container" class="hidden">
-            <!-- ABA 1: VALIDAÇÃO DE PEDIDOS -->
             <div id="validation-section" class="content-section">
                 <h2>Validação de Pedidos</h2>
                 <div id="validation-summary-container"></div>
                 <div id="validation-results-container"></div>
             </div>
 
-            <!-- Resumo Geral -->
             <div id="general-summary-section" class="content-section">
                 <div id="sector-summary-container"></div>
             </div>
 
-            <!-- ABA 2: ANÁLISE POR SETOR -->
             <div id="sector-section" class="content-section">
                 <h2>Acompanhamento por Setor</h2>
                 <div id="sector-results-container"></div>
             </div>
 
-            <!-- NOVA SEÇÃO: ETIQUETAS -->
             <div id="label-section" class="content-section">
                 <div id="label-analysis-container"></div>
             </div>
 
-            <!-- NOVA SEÇÃO: FILIAIS -->
             <div id="filial-section" class="content-section">
                 <div id="filial-analysis-container"></div>
             </div>
 
-            <!-- NOVA SEÇÃO: SEM FATURAMENTO -->
             <div id="no-billing-section" class="content-section">
                 <div id="no-billing-container"></div>
             </div>
 
-            <!-- ABA 3: ACOMPANHAMENTO DE PRODUTOS -->
             <div id="product-section" class="content-section">
                 <div id="product-top20-geral-container"></div>
                 <div id="product-top20-setor-container" style="margin-top: 3rem;"></div>
@@ -420,10 +410,8 @@
         </div>
     </div>
 
-    <!-- Container para o Modal de Detalhes -->
     <div id="details-modal" class="modal-overlay hidden"></div>
 
-    <!-- Modal para partilhar link -->
     <div id="share-link-modal" class="modal-overlay hidden">
         <div class="modal-content" style="max-width: 600px;">
             <div class="modal-header">
@@ -445,7 +433,6 @@
         </div>
     </div>
     
-    <!-- (NOVO) Modal para confirmar atualização -->
     <div id="update-share-modal" class="modal-overlay hidden">
         <div class="modal-content" style="max-width: 600px;">
             <div class="modal-header">
@@ -1012,10 +999,10 @@
                 const products = productsBySector[setor];
                 const totalUnidadesSetor = products.reduce((sum, item) => sum + item.unidades, 0);
                 const top30 = products.sort((a, b) => b.unidades - a.unidades).slice(0, 30);
-                const tableRows = top30.map(item => `<tr><td>${item.codigo}</td><td>${item.skus}</td><td class="text-right">${formatNumber(item.unidades)}</td><td class="text-right">${totalUnidadesSetor > 0 ? ((item.unidades / totalUnidadesSetor) * 100).toFixed(1).replace('.',',') : '0,0'}%</td></tr>`).join('');
+                const tableRows = top30.map(item => `<tr><td>${item.codigo}</td><td>${item.skus}</td><td>${item.posicao}</td><td class="text-right">${formatNumber(item.unidades)}</td><td class="text-right">${totalUnidadesSetor > 0 ? ((item.unidades / totalUnidadesSetor) * 100).toFixed(1).replace('.',',') : '0,0'}%</td></tr>`).join('');
                 const card = document.createElement('div');
                 card.className = 'sector-detail-card';
-                card.innerHTML = `<div class="sector-detail-card-header"><h3>Setor: ${setor}</h3><span class="toggle-icon-sector">▼</span></div><div class="sector-detail-content"><div id="sector-card-wrapper-${index}" class="table-wrapper"><button class="copy-image-btn" data-target="#sector-card-wrapper-${index}" data-filename="top30_${setor.replace(/\s/g, '_')}.png"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/></svg>Copiar como Imagem</button><button class="export-btn pdf export-sector-pdf-btn" data-sector="${setor}"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="margin-right: -2px; margin-top: -2px;"><path d="M14.5 2H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.5L14.5 2zM12 0H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z"/><path d="M9.5 7V3.5h-3v4h3zm-3 1H5v2h1.5V8zm1.5 0h2v2H8V8zm2 0h1.5v2H10V8zm-2 3h-2v2h2v-2z"/></svg>Exportar PDF</button><div class="table-responsive-wrapper"><table><thead><tr><th>Código</th><th>SKU</th><th class="text-right">Unidades</th><th class="text-right">% Setor</th></tr></thead><tbody>${tableRows}</tbody><tfoot><tr><td colspan="2"><strong>Total do Setor</strong></td><td class="text-right"><strong>${formatNumber(totalUnidadesSetor)}</strong></td><td class="text-right"><strong>100,0%</strong></td></tr></tfoot></table></div></div></div></div>`;
+                card.innerHTML = `<div class="sector-detail-card-header"><h3>Setor: ${setor}</h3><span class="toggle-icon-sector">▼</span></div><div class="sector-detail-content"><div id="sector-card-wrapper-${index}" class="table-wrapper"><button class="copy-image-btn" data-target="#sector-card-wrapper-${index}" data-filename="top30_${setor.replace(/\s/g, '_')}.png"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/></svg>Copiar como Imagem</button><button class="export-btn pdf export-sector-pdf-btn" data-sector="${setor}"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="margin-right: -2px; margin-top: -2px;"><path d="M14.5 2H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.5L14.5 2zM12 0H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z"/><path d="M9.5 7V3.5h-3v4h3zm-3 1H5v2h1.5V8zm1.5 0h2v2H8V8zm2 0h1.5v2H10V8zm-2 3h-2v2h2v-2z"/></svg>Exportar PDF</button><div class="table-responsive-wrapper"><table><thead><tr><th>Código</th><th>SKU</th><th>Endereço</th><th class="text-right">Unidades</th><th class="text-right">% Setor</th></tr></thead><tbody>${tableRows}</tbody><tfoot><tr><td colspan="3"><strong>Total do Setor</strong></td><td class="text-right"><strong>${formatNumber(totalUnidadesSetor)}</strong></td><td class="text-right"><strong>100,0%</strong></td></tr></tfoot></table></div></div></div></div>`;
                 card.querySelector('.sector-detail-card-header').addEventListener('click', (e) => { card.classList.toggle('open'); });
                 grid.appendChild(card);
             });
@@ -1569,10 +1556,11 @@
                         subtitle += ` | Total de Etiquetas: ${formatNumber(totalEtiquetasSetor)}`;
                     }
                     const title = `Relatório de Saídas - Setor: ${sector}`;
-                    const head = ['Código', 'SKU', 'Unidades', '% Setor'];
+                    const head = ['Código', 'SKU', 'Endereço', 'Unidades', '% Setor'];
                     const body = top30SectorProducts.map(item => [
                         item.codigo,
                         item.skus,
+                        item.posicao,
                         formatNumber(item.unidades),
                         `${totalUnidadesSetor > 0 ? ((item.unidades / totalUnidadesSetor) * 100).toFixed(1).replace('.',',') : '0,0'}%`
                     ]);
