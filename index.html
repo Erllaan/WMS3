@@ -718,7 +718,12 @@
                 const codigoLoja = clienteField.split('-')[0].trim();
                 let rotaOriginal = String(row['Rota'] || 'N/A').trim();
                 const storeInfo = masterStoreList.get(codigoLoja);
-                if (storeInfo && rotaOriginal === '916') rotaOriginal = storeInfo.rota;
+                
+                // Melhoria: Captura se a rota for '916', 'N/A' ou vazia.
+                if (storeInfo && (rotaOriginal === '916' || rotaOriginal === 'N/A' || rotaOriginal === '')) {
+                    rotaOriginal = storeInfo.rota;
+                }
+                
                 const nomeLoja = storeInfo ? storeInfo.name : clienteField.split('-').slice(1).join('-').trim() || 'N/A';
                 if (!rotasData[rotaOriginal]) rotasData[rotaOriginal] = { pedidos: [] };
                 rotasData[rotaOriginal].pedidos.push({ codigo: codigoLoja, nome: nomeLoja, pedido: pedidoLegado, qtd: quantidade });
@@ -747,7 +752,12 @@
                     let rota = String(row['Rota'] || 'N/A').trim();
                     const storeInfo = masterStoreList.get(codigoLoja);
                     const nomeLoja = storeInfo ? storeInfo.name : (String(row['Nome da Loja'] || '').trim() || 'N/A');
-                    if (storeInfo && rota === '916') rota = storeInfo.rota;
+                    
+                    // Melhoria: Captura se a rota for '916', 'N/A' ou vazia.
+                    if (storeInfo && (rota === '916' || rota === 'N/A' || rota === '')) {
+                        rota = storeInfo.rota;
+                    }
+                    
                     if (!filialData.has(rota)) filialData.set(rota, new Map());
                     const filiaisDaRota = filialData.get(rota);
                     const filialKey = `${codigoLoja} - ${nomeLoja}`;
@@ -777,7 +787,12 @@
                             setorInfo.totalLabels += labelsForThisItem;
                             let rota = String(row['Rota'] || 'N/A').trim();
                             const storeInfo = masterStoreList.get(String(row['Loja Cross'] || row['Código da Loja'] || '').trim());
-                            if (storeInfo && rota === '916') rota = storeInfo.rota;
+                            
+                            // Melhoria: Captura se a rota for '916', 'N/A' ou vazia.
+                            if (storeInfo && (rota === '916' || rota === 'N/A' || rota === '')) {
+                                rota = storeInfo.rota;
+                            }
+                            
                             const currentRouteLabels = setorInfo.labelsByRoute.get(rota) || 0;
                             setorInfo.labelsByRoute.set(rota, currentRouteLabels + labelsForThisItem);
                         }
@@ -1114,7 +1129,10 @@
                             const nomeLoja = storeInfo ? storeInfo.name : (String(row['Nome da Loja'] || '').trim() || 'N/A');
                             const filialKey = `${codigoLoja} - ${nomeLoja}`;
                             let rota = String(row['Rota'] || 'N/A').trim();
-                            if(storeInfo && rota === '916') rota = storeInfo.rota;
+                            
+                            // Melhoria Rota
+                            if(storeInfo && (rota === '916' || rota === 'N/A' || rota === '')) rota = storeInfo.rota;
+                            
                             const qty = parseFloat(row['Qtd'] || row['Sum Qtd Solicitada'] || row['Tot'] || 0);
                             if(!acc[filialKey]) acc[filialKey] = { rota: rota, qtd: 0 };
                             acc[filialKey].qtd += qty;
@@ -1140,7 +1158,10 @@
                             const nomeLoja = storeInfo ? storeInfo.name : (String(row['Nome da Loja'] || '').trim() || 'N/A');
                             const filialKey = `${codigoLoja} - ${nomeLoja}`;
                             let rota = String(row['Rota'] || 'N/A').trim();
-                            if(storeInfo && rota === '916') rota = storeInfo.rota;
+                            
+                            // Melhoria Rota
+                            if(storeInfo && (rota === '916' || rota === 'N/A' || rota === '')) rota = storeInfo.rota;
+                            
                             const qty = parseFloat(row['Qtd'] || row['Sum Qtd Solicitada'] || row['Tot'] || 0);
                             if(!acc[filialKey]) acc[filialKey] = { rota: rota, qtd: 0 };
                             acc[filialKey].qtd += qty;
@@ -1171,7 +1192,10 @@
                 const nomeLoja = storeInfo ? storeInfo.name : (String(row['Nome da Loja'] || '').trim() || 'N/A');
                 const filialKey = `${codigoLoja} - ${nomeLoja}`;
                 let rota = String(row['Rota'] || 'N/A').trim();
-                if(storeInfo && rota === '916') rota = storeInfo.rota;
+                
+                // Melhoria Rota
+                if(storeInfo && (rota === '916' || rota === 'N/A' || rota === '')) rota = storeInfo.rota;
+                
                 const qty = parseFloat(row['Qtd'] || row['Sum Qtd Solicitada'] || row['Tot'] || 0);
                 if(!acc[filialKey]) acc[filialKey] = { rota: rota, qtd: 0 };
                 acc[filialKey].qtd += qty;
