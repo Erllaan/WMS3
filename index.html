@@ -1,6 +1,4 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
+<!DOCTYPE html><html lang="pt-BR"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard WMS Multifuncional</title>
@@ -227,7 +225,8 @@
         #sector-analysis-table tfoot tr { background-color: var(--sector-light); border-top: 2px solid var(--sector-primary); }
         #sector-analysis-table tfoot td, #label-analysis-table tfoot td { font-weight: 700; font-size: 0.9em; }
         #sector-analysis-table .col-setor { font-weight: 600; width: 40%; }
-        #sector-analysis-table .col-unidades, #sector-analysis-table .col-skus, #sector-analysis-table .col-percent { text-align: right; font-weight: 500; width: 20%; }
+        /* INCLUSÃO DA NOVA COLUNA .col-qms */
+        #sector-analysis-table .col-unidades, #sector-analysis-table .col-qms, #sector-analysis-table .col-skus, #sector-analysis-table .col-percent { text-align: right; font-weight: 500; width: 15%; }
         
         #label-analysis-table th:first-child, #label-analysis-table td:first-child { text-align: left; font-weight: 600; position: sticky; left: 0; background-color: #f8f9fa; }
         #label-analysis-table tbody td:first-child { background-color: var(--card-background); }
@@ -295,7 +294,6 @@
     <div id="notification" class="notification"></div>
     <div class="container">
         <div id="loader" class="loader-overlay hidden"><div class="loader-spinner"></div>A processar...</div>
-
         <div id="last-updated-container" class="hidden"></div>
         
         <div id="file-control-panel" class="content-section open">
@@ -514,13 +512,13 @@
         const masterStoreList = new Map([
             // ROTAS INTACTAS (5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 20)
             ['VD992',{name:'DSP VITORIA DA CONQUISTA',rota:'6'}],['L2437',{name:'DSP VITORIA DA CONQUISTA II',rota:'6'}],['L2527',{name:'DSP VITORIA DA CONQUISTA JURACY',rota:'6'}],['VD863',{name:'DSP BARREIRAS',rota:'6'}],['VD862',{name:'DSP LUIS EDUARDO MAGALHAES',rota:'6'}],['L2554',{name:'DSP ITABUNA III',rota:'6'}],['L2290',{name:'DSP LUIS EDUARDO MAGALHAES II',rota:'6'}],['L2291',{name:'DSP SANTO ANTONIO DE JESUS',rota:'6'}],['L2412',{name:'DSP ILHEUS',rota:'6'}],['L2662',{name:'DSP SHOPPING BOULEVARD',rota:'7'}],['L2127',{name:'DSP FEIRA DE SANTANA IV',rota:'7'}],['VD390',{name:'DSP FEIRA DE SANTANA',rota:'7'}],['L2116',{name:'DSP FEIRA DE SANTANA III',rota:'7'}],['VD630',{name:'DSP DIAS DAVILA',rota:'7'}],['VD552',{name:'DSP CAMACARI',rota:'7'}],['L2531',{name:'DSP GUARAJUBA',rota:'7'}],['L2204',{name:'DSP SHOPPING CENTER LAPA',rota:'8'}],['L2538',{name:'DSP SALVADOR 1',rota:'8'}],['L2052',{name:'DSP METRO SALVADOR',rota:'8'}],['L2283',{name:'DSP SHOPPING VITORIA BOULEVARD',rota:'8'}],['L2161',{name:'DSP CANELA II',rota:'8'}],['VD395',{name:'DSP CANELA',rota:'8'}],['L2064',{name:'DSP SALVADOR CHAME CHAME',rota:'8'}],['L2173',{name:'DSP PARQUE SHOPPING BAHIA',rota:'9'}],['L2119',{name:'DSP ESTRADA DO COCO',rota:'9'}],['L2363',{name:'DSP VILAS DO ATLANTICO I',rota:'9'}],['L2668',{name:'DSP ALPHAVILLE LITORAL NORTE',rota:'9'}],['VD547',{name:'DSP ITAPUA',rota:'9'}],['VD458',{name:'DSP ITAPUA II',rota:'9'}],['VD744',{name:'DSP PIATA',rota:'9'}],['VD737',{name:'DSP PATAMARES',rota:'9'}],['VD546',{name:'DSP JORGE AMADO',rota:'9'}],['L2003',{name:'DSP TROBOGY',rota:'10'}],['VD834',{name:'DSP SAO RAFAEL',rota:'10'}],['L2174',{name:'DSP SHOPPING PARALELA',rota:'10'}],['VD845',{name:'DSP CAJAZEIRAS',rota:'10'}],['L2221',{name:'DSP PERIPERI',rota:'10'}],['VD643',{name:'DSP SIMOES FILHO',rota:'10'}],['VD620',{name:'DSP CANDEIAS',rota:'10'}],['L2077',{name:'DSP SHOPPING BELLA VISTA',rota:'11'}],['L2211',{name:'DSP PERNAMBUES',rota:'11'}],['VD544',{name:'DSP MATATU',rota:'11'}],['VD929',{name:'DSP ACUPE DE BROTAS',rota:'11'}],['L2631',{name:'DSP BROTAS III',rota:'11'}],['VD399',{name:'DSP NOVA BROTAS',rota:'11'}],['VD981',{name:'DSP VASCO DA GAMA',rota:'11'}],['L2277',{name:'DSP FEDERACAO SALVADOR',rota:'11'}],['VD397',{name:'DSP ONDINA',rota:'11'}],['L2243',{name:'DSP SHOPPING BARRA SALVADOR',rota:'12'}],['L2088',{name:'DSP RIO VERMELHO II',rota:'12'}],['VD432',{name:'DSP PITUBA III',rota:'12'}],['L2056',{name:'DSP PITUBA IV',rota:'12'}],['VD890',{name:'DSP CAMINHO DAS ARVORES II',rota:'12'}],['VD712',{name:'DSP ANITA GARIBALDI',rota:'12'}],['VD398',{name:'DSP MIGUEL CALMON',rota:'12'}],['L2191',{name:'DSP MARES',rota:'12'}],['VD697',{name:'DSP IMBUI',rota:'13'}],['VD550',{name:'DSP COSTA AZUL',rota:'13'}],['L2123',{name:'DSP COSTA AZUL II',rota:'13'}],['VD936',{name:'DSP STIEP',rota:'13'}],['VD393',{name:'DSP CABULA',rota:'13'}],['VD821',{name:'DSP SALVADOR III',rota:'13'}],['VD530',{name:'DSP LAURO DE FREITAS',rota:'14'}],['VD558',{name:'DSP STELLA MARIS',rota:'14'}],['VD926',{name:'DSP CABULA II',rota:'15'}],['L2169',{name:'DSP CANDEAL',rota:'15'}],['L2093',{name:'DSP SHOPPING DA BAHIA 3 PISO',rota:'15'}],['L2092',{name:'DSP SHOPPING DA BAHIA 2 PISO',rota:'15'}],['L2091',{name:'DSP SHOPPING DA BAHIA 1 PISO',rota:'15'}],['VD713',{name:'DSP LARGO DO TAMARINEIRO',rota:'16'}],['VD970',{name:'DSP CAMINHO DE AREIA',rota:'16'}],['VD604',{name:'DSP GRACA',rota:'16'}],['VD220',{name:'DSP PITUBA',rota:'16'}],['VD434',{name:'DSP ALTO DO ITAIGARA',rota:'16'}],['VD568',{name:'DSP CAMINHO DAS ARVORES',rota:'16'}],['VD913',{name:'DSP CAMINHO DAS ARVORES III',rota:'20'}],['VD435',{name:'DSP SHOPPING SALVADOR',rota:'20'}],['L2280',{name:'DSP ALPHAVILLE SALVADOR',rota:'20'}],['L2428',{name:'DSP PETROLINA',rota:'5'}],['L2429',{name:'DSP PETROLina CENTRO',rota:'5'}],['L2496',{name:'DSP PETROLINA II',rota:'5'}],['L2582',{name:'DSP SHOPPING RIVER',rota:'5'}],
-            
             // NOVAS ATUALIZAÇÕES BASEADAS NA IMAGEM (ROTAS 1, 2, 3, 4)
             ['L2371',{name:'DSP ROSA E SILVA',rota:'1'}],['L2375',{name:'DSP ESTRADA DO ARRAIAL',rota:'1'}],['VD695',{name:'DSP TORRE',rota:'1'}],['L2383',{name:'DSP MADALENA II',rota:'1'}],['L2074',{name:'DSP SHOPPING RIOMAR',rota:'1'}],['VD690',{name:'DSP BOA VIAGEM IV',rota:'1'}],['L2508',{name:'DSP SHOPPING RECIFE',rota:'1'}],
             ['VD772',{name:'DSP BOA VIAGEM',rota:'2'}],['L2617',{name:'DSP CONSELHEIRO AGUIAR III',rota:'2'}],['VD755',{name:'DSP BOA VIAGEM II',rota:'2'}],['L2534',{name:'DSP DOMINGOS FERREIRA',rota:'2'}],['VD770',{name:'DSP BOA VIAGEM V',rota:'2'}],['L2597',{name:'DSP SETUBAL',rota:'2'}],['VD767',{name:'DSP GUARARAPES III',rota:'2'}],
             ['VD698',{name:'DSP OLINDA',rota:'3'}],['L2493',{name:'DSP ESPINHEIRO',rota:'3'}],['L2689',{name:'DSP PARNAMIRIM',rota:'3'}],['L2590',{name:'DSP ESTRADA DAS UBAIAS',rota:'3'}],['L2589',{name:'DSP IPUTINGA',rota:'3'}],['L2368',{name:'DSP CAXANGA',rota:'3'}],['L2386',{name:'DSP IMBIRIBEIRA',rota:'3'}],['L2636',{name:'DSP ERNESTO DE PAULA',rota:'3'}],
             ['L2507',{name:'DSP SHOPPING PATTEO OLINDA',rota:'4'}],['L2438',{name:'DSP CARUARU II',rota:'4'}],['L2384',{name:'DSP VITORIA DE SANTO ANTAO',rota:'4'}],['VD794',{name:'DSP JANGA',rota:'4'}],['VD871',{name:'DSP OLINDA II',rota:'4'}]
         ]);
+        
         const customOrder = ["AL FRAGIL", "AL BIG", "Alimentos", "Antibioticos", "MED BIG", "Medicamento 1", "Medicamento 2", "P1 BIG", "Perfumaria 1", "P2 BIG", "Perfumaria 2", "Perfumaria 3", "Piscotropicos", "SEM GIRO", "Romaneio", "Fralda", "Termolabeis", "Volumosos", "Visados", "Visados 2", "Baixo Giro", "Especial"];
         const orderMap = new Map(customOrder.map((name, index) => [name.toUpperCase(), index]));
         const getOrder = (sectorName) => orderMap.get(sectorName.toUpperCase()) ?? Infinity;
@@ -580,7 +578,7 @@
             }
         };
 
-        // ==========================================================
+        //        // ==========================================================
         // === 2. FUNÇÕES DE UTILIDADE ===
         // ==========================================================
         function showNotification(message, type = 'success', duration = 3500) {
@@ -653,7 +651,7 @@
             }, 50);
         }
 
-        // ==========================================================
+        //        // ==========================================================
         // === 3. FUNÇÕES DE PROCESSAMENTO E ANÁLISE ===
         // ==========================================================
         function runAllAnalyses() {
@@ -740,12 +738,16 @@
             const filiaisComFaturamento = new Set();
             let totalQuantidade = 0;
             let totalSkus = new Set();
+            
             for (const row of appState.sectorData) {
                 const quantidade = parseFloat(row['Qtd'] || row['Sum Qtd Solicitada'] || row['Tot'] || 0);
                 const itemCode = normalizeCode(row['Item']);
+                
                 if (isNaN(quantidade) || !itemCode) continue;
+                
                 totalQuantidade += quantidade;
                 totalSkus.add(itemCode);
+                
                 const codigoLoja = String(row['Loja Cross'] || row['Código da Loja'] || '').trim();
                 if (codigoLoja) {
                     filiaisComFaturamento.add(codigoLoja);
@@ -763,13 +765,16 @@
                     const filialKey = `${codigoLoja} - ${nomeLoja}`;
                     filiaisDaRota.set(filialKey, (filiaisDaRota.get(filialKey) || 0) + quantidade);
                 }
+                
                 const address = appState.addressData.get(itemCode);
                 if (address) {
                     const setor = address.split('.')[0];
                     const descr = String(row['Descr'] || 'N/A').trim();
+                    
                     if (!setoresData.has(setor)) {
                         setoresData.set(setor, {
                             totalQtd: 0,
+                            totalQmsCx: 0, // NOVO: Cálculo de QMS para todos os setores
                             products: new Map(),
                             totalLabels: 0,
                             labelsByRoute: new Map()
@@ -777,18 +782,23 @@
                     }
                     const setorInfo = setoresData.get(setor);
                     setorInfo.totalQtd += quantidade;
+                    
+                    // --- CÁLCULO DE CAIXAS (QMS) PARA TODOS OS SETORES ---
+                    const qms = appState.productMasterData.get(itemCode) || 1;
+                    const qmsCx = qms > 0 ? quantidade / qms : 0;
+                    setorInfo.totalQmsCx += qmsCx;
+
                     const productInfo = setorInfo.products.get(itemCode) || { descr: descr, totalQtd: 0 };
                     productInfo.totalQtd += quantidade;
                     setorInfo.products.set(itemCode, productInfo);
+                    
                     if (labelSectors.has(setor.toUpperCase())) {
-                        const qms = appState.productMasterData.get(itemCode) || 1;
                         if (qms > 0) {
                             const labelsForThisItem = Math.ceil(quantidade / qms);
                             setorInfo.totalLabels += labelsForThisItem;
                             let rota = String(row['Rota'] || 'N/A').trim();
                             const storeInfo = masterStoreList.get(String(row['Loja Cross'] || row['Código da Loja'] || '').trim());
                             
-                            // Melhoria: Captura se a rota for '916', 'N/A' ou vazia.
                             if (storeInfo && (rota === '916' || rota === 'N/A' || rota === '')) {
                                 rota = storeInfo.rota;
                             }
@@ -799,13 +809,17 @@
                     }
                 }
             }
+            
             const totalUniqueFiliais = filiaisComFaturamento.size;
             const filiaisSemFaturamento = [];
             for (const [storeCode, storeInfo] of masterStoreList.entries()) {
                 if (!filiaisComFaturamento.has(storeCode)) filiaisSemFaturamento.push(`${storeCode} - ${storeInfo.name}`);
             }
+            
             appState.processedData.sectorAnalysis = { setoresData, filialData, totalQuantidadeGeral: totalQuantidade, totalSkusGeral: totalSkus.size, totalUniqueFiliais, filiaisSemFaturamento };
+            
             UIElements.containers.sectorSummary.innerHTML = `<div class="geral-summary-grid"><div class="geral-summary-card"><div class="icon sector"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg></div><div class="info"><p>Quantidade Total</p><div class="value">${formatNumber(totalQuantidade)}</div></div></div><div class="geral-summary-card"><div class="icon skus"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4"/><path d="M12 20v2"/><path d="M5 12H3"/><path d="M21 12h-2"/><path d="m18.36 5.64-.18-.18"/><path d="m5.82 18.18-.18-.18"/><path d="m18.18 18.18-.18.18"/><path d="m5.64 5.64-.18.18"/></svg></div><div class="info"><p>Total de SKUs Analisados</p><div class="value">${formatNumber(totalSkus.size)}</div></div></div></div>`;
+            
             displaySectorResults(appState.processedData.sectorAnalysis);
             autoClosePanel();
         }
@@ -815,10 +829,12 @@
             const productQuantities = new Map();
             const productDescriptions = new Map();
             const productSalesDetails = new Map();
+            
             for (const row of appState.sectorData) {
                 const code = normalizeCode(row['Item']);
                 const qty = parseFloat(row['Qtd'] || row['Sum Qtd Solicitada'] || row['Tot'] || 0);
                 const descr = String(row['Descr'] || 'N/A').trim();
+                
                 if (code && !isNaN(qty)) {
                     productQuantities.set(code, (productQuantities.get(code) || 0) + qty);
                     if (!productDescriptions.has(code)) productDescriptions.set(code, descr);
@@ -826,6 +842,7 @@
                     productSalesDetails.get(code).push(row);
                 }
             }
+            
             const totalGeralUnidades = [...productQuantities.values()].reduce((sum, qty) => sum + qty, 0);
             const analysisData = [...productQuantities.entries()].map(([code, unidades]) => {
                 const qms = appState.productMasterData.get(code) || 1;
@@ -833,20 +850,24 @@
                 const setor = address !== 'N/A' ? address.split('.')[0] : 'N/A';
                 return { codigo: code, skus: productDescriptions.get(code) || 'N/A', unidades: unidades, qms: qms, cx: qms > 0 ? unidades / qms : 0, percent: totalGeralUnidades > 0 ? (unidades / totalGeralUnidades) * 100 : 0, setor: setor, posicao: address };
             });
+            
             analysisData.sort((a, b) => b.unidades - a.unidades);
             appState.processedData.productAnalysis = { analysisData, productSalesDetails };
+            
             displayProductAnalysisResults(analysisData);
+            
             const productsBySector = analysisData.reduce((acc, product) => {
                 const sector = product.setor || 'N/A';
                 if (!acc[sector]) acc[sector] = [];
                 acc[sector].push(product);
                 return acc;
             }, {});
+            
             displayTop20BySector(productsBySector);
             setupProductSearch(analysisData, productSalesDetails);
         }
 
-        // ==========================================================
+        //        // ==========================================================
         // === 4. FUNÇÕES DE RENDERIZAÇÃO E UI ===
         // ==========================================================
         function displayValidationRouteResults(rotasData, container) {
@@ -871,6 +892,7 @@
             const labelContainer = UIElements.containers.labelAnalysis;
             const filialContainer = UIElements.containers.filialAnalysis;
             const noBillingContainer = UIElements.containers.noBilling;
+            
             sectorContainer.innerHTML = '';
             labelContainer.innerHTML = '';
             filialContainer.innerHTML = '';
@@ -886,16 +908,46 @@
                     else if (index < mediumThreatCount) threatMap.set(setor, 'threat-medium');
                     else threatMap.set(setor, 'threat-low');
                 });
+                
                 const sortedSetores = [...setoresData.entries()].sort((a, b) => getOrder(a[0]) - getOrder(b[0]) || a[0].localeCompare(b[0]));
-                const tableRows = sortedSetores.map(([setor, data]) => `<tr class="${threatMap.get(setor) || 'threat-low'}"><td class="col-setor">${setor}</td><td class="col-unidades">${formatNumber(data.totalQtd)}</td><td class="col-skus">${formatNumber(data.products.size)}</td><td class="col-percent">${(totalQuantidadeGeral > 0 ? (data.totalQtd / totalQuantidadeGeral) * 100 : 0).toFixed(1).replace('.', ',')}%</td></tr>`).join('');
+                
+                // --- CONSTRUÇÃO DA NOVA TABELA COM COLUNA QMS ---
+                const tableRows = sortedSetores.map(([setor, data]) => `<tr class="${threatMap.get(setor) || 'threat-low'}"><td class="col-setor">${setor}</td><td class="col-unidades">${formatNumber(data.totalQtd)}</td><td class="col-qms">${(data.totalQmsCx || 0).toFixed(1).replace('.', ',')}</td><td class="col-skus">${formatNumber(data.products.size)}</td><td class="col-percent">${(totalQuantidadeGeral > 0 ? (data.totalQtd / totalQuantidadeGeral) * 100 : 0).toFixed(1).replace('.', ',')}%</td></tr>`).join('');
+                
                 const totalPercent = sortedSetores.reduce((sum, [, data]) => sum + (data.totalQtd / totalQuantidadeGeral), 0) * 100;
-                sectorContainer.innerHTML = `<button class="copy-image-btn" data-target="#sector-analysis-table-wrapper" data-filename="analise_por_setor.png"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/></svg>Copiar como Imagem</button><div class="table-responsive-wrapper" id="sector-analysis-table-wrapper"><table id="sector-analysis-table"><thead><tr><th class="col-setor">Setor</th><th class="col-unidades">Unidades</th><th class="col-skus">SKUs</th><th class="col-percent">%</th></tr></thead><tbody>${tableRows}</tbody><tfoot><tr><td class="col-setor">TOTAL</td><td class="col-unidades">${formatNumber(totalQuantidadeGeral)}</td><td class="col-skus">${formatNumber(totalSkusGeral)}</td><td class="col-percent">${totalPercent.toFixed(1).replace('.', ',')}%</td></tr></tfoot></table></div>`;
+                const totalQmsGeral = sortedSetores.reduce((sum, [, data]) => sum + (data.totalQmsCx || 0), 0);
+
+                sectorContainer.innerHTML = `<button class="copy-image-btn" data-target="#sector-analysis-table-wrapper" data-filename="analise_por_setor.png"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/></svg>Copiar como Imagem</button>
+                <div class="table-responsive-wrapper" id="sector-analysis-table-wrapper">
+                    <table id="sector-analysis-table">
+                        <thead>
+                            <tr>
+                                <th class="col-setor">Setor</th>
+                                <th class="col-unidades">Unidades</th>
+                                <th class="col-qms text-right">Caixas (QMS)</th>
+                                <th class="col-skus">SKUs</th>
+                                <th class="col-percent">%</th>
+                            </tr>
+                        </thead>
+                        <tbody>${tableRows}</tbody>
+                        <tfoot>
+                            <tr>
+                                <td class="col-setor">TOTAL</td>
+                                <td class="col-unidades">${formatNumber(totalQuantidadeGeral)}</td>
+                                <td class="col-qms text-right">${totalQmsGeral.toFixed(1).replace('.', ',')}</td>
+                                <td class="col-skus">${formatNumber(totalSkusGeral)}</td>
+                                <td class="col-percent">${totalPercent.toFixed(1).replace('.', ',')}%</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>`;
             } else {
                 sectorContainer.innerHTML = `<div class='placeholder-card'><p>Carregue a <strong>Planilha de Endereços</strong> para visualizar o acompanhamento por setor.</p></div>`;
             }
 
             const sortedSetoresForLabels = [...setoresData.entries()].sort((a, b) => getOrder(a[0]) - getOrder(b[0]) || a[0].localeCompare(b[0]));
             const labelSectorsData = sortedSetoresForLabels.filter(([setor]) => labelSectors.has(setor.toUpperCase()));
+            
             if (labelSectorsData.length > 0) {
                 if (appState.productMasterData.size === 0 && !isReadOnlySharedView) {
                     labelContainer.innerHTML = `<h2>Estimativa de Etiquetas por Rota (QMS)</h2><div class="placeholder-card"><p>Carregue a planilha de <strong>Cadastro de Produtos (QMS)</strong> para ver a estimativa de etiquetas.</p></div>`;
@@ -908,9 +960,11 @@
                     });
                     const sortedRoutes = [...allRoutesWithLabels].sort((a, b) => String(a).localeCompare(String(b), undefined, {numeric: true}));
                     const sortedLabelSectors = labelSectorsData.map(([setor]) => setor);
+                    
                     let headerHtml = `<th>Rota</th>`;
                     sortedLabelSectors.forEach(setor => { headerHtml += `<th class="text-right">${setor}</th>`; });
                     headerHtml += `<th class="text-right">Total Rota</th>`;
+                    
                     const labelTableRows = sortedRoutes.map(rota => {
                         let rowHtml = `<tr><td><strong>Rota ${rota}</strong></td>`;
                         let totalRota = 0;
@@ -931,6 +985,7 @@
                         footerHtml += `<td class="text-right"><strong>${formatNumber(totalSetor)}</strong></td>`;
                     });
                     footerHtml += `<td class="text-right"><strong>${formatNumber(grandTotal)}</strong></td></tr>`;
+                    
                     labelContainer.innerHTML = `<h2>Estimativa de Etiquetas por Rota (QMS)</h2><button class="copy-image-btn" data-target="#label-analysis-table-wrapper" data-filename="analise_etiquetas_por_rota.png"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/></svg>Copiar como Imagem</button><div class="table-responsive-wrapper" id="label-analysis-table-wrapper"><table id="label-analysis-table" style="border: 1px solid var(--border-color);"><thead><tr>${headerHtml}</tr></thead><tbody>${labelTableRows}</tbody><tfoot style="background-color: var(--sector-light); border-top: 2px solid var(--sector-primary);">${footerHtml}</tfoot></table></div>`;
                 }
             } else {
@@ -946,6 +1001,7 @@
                     const filialRows = sortedFiliais.map(([filial, qtd]) => `<tr><td>${filial}</td><td>${formatNumber(qtd)}</td><td>${(totalRota > 0 ? (qtd / totalRota) * 100 : 0).toFixed(0)}%</td></tr>`).join('');
                     return `<div class="rota-accordion-item"><div class="rota-accordion-header"><h2>Rota: ${rota}</h2><div class="rota-summary-info"><span>${sortedFiliais.length} Filial(is)</span><span>|</span><span>${formatNumber(totalRota)} Unidades</span></div><span class="toggle-icon-rota">▼</span></div><div class="rota-accordion-content"><div id="filial-wrapper-${index}" class="content-wrapper table-responsive-wrapper"><button class="copy-image-btn" data-target="#filial-wrapper-${index}" data-filename="faturamento_rota_${rota}.png" style="margin-bottom: 1rem;">Copiar como Imagem</button><table id="filial-table-${index}"><thead><tr><th>Filial</th><th>Unidades</th><th>% da Rota</th></tr></thead><tbody>${filialRows}</tbody><tfoot><tr><td><strong>Total Rota</strong></td><td><strong>${formatNumber(totalRota)}</strong></td><td><strong>100%</strong></td></tr></tfoot></table></div></div></div>`;
                 }).join('');
+                
                 filialContainer.innerHTML = `<h2>Faturamento por Filiais</h2><div class="summary-card"><h2>Resumo de Filiais</h2><p>${formatNumber(totalUniqueFiliais)} filiais faturaram no período.</p></div><div id="filial-accordion-container">${filialAccordionsHTML}</div>`;
                 filialContainer.querySelectorAll('.rota-accordion-header').forEach(header => header.addEventListener('click', () => header.parentElement.classList.toggle('open')));
             } else {
@@ -966,6 +1022,7 @@
 
                 const sortedRotas = Array.from(filiaisByRota.keys()).sort((a,b) => String(a).localeCompare(String(b), undefined, {numeric: true}));
                 let htmlContent = `<div class="summary-card"><h2>Atenção</h2><p>${filiaisSemFaturamento.length} filiais não apresentaram faturamento no período.</p></div>`;
+                
                 sortedRotas.forEach(rota => {
                     const filiaisDaRota = filiaisByRota.get(rota).sort();
                     const listaFiliais = filiaisDaRota.map(filial => `<li>${filial}</li>`).join('');
@@ -984,6 +1041,7 @@
                             </div>
                         </div>`;
                 });
+                
                 noBillingContainer.innerHTML = `<h2>Filiais Sem Faturamento</h2>${htmlContent}`;
                 noBillingContainer.querySelectorAll('.sector-detail-card-header').forEach(header => {
                     header.addEventListener('click', () => {
@@ -1009,16 +1067,26 @@
             const totalUnidades = top20Data.reduce((sum, item) => sum + item.unidades, 0);
             const totalCx = top20Data.reduce((sum, item) => sum + item.cx, 0);
             const totalPercent = top20Data.reduce((sum, item) => sum + item.percent, 0);
-            top20Container.innerHTML += `<button class="copy-image-btn" data-target="#product-top20-geral-table-wrapper" data-filename="top_20_skus_geral.png"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/></svg>Copiar como Imagem</button><div class="table-responsive-wrapper" id="product-top20-geral-table-wrapper"><table id="product-top20-geral-table"><thead><tr><th>Código</th><th>SKUS</th><th class="text-right">Unidades</th><th class="text-right">QMS</th><th class="text-right">CX</th><th class="text-right">%</th><th>Setor</th><th>Posição</th></tr></thead><tbody>${tableRows}</tbody><tfoot><tr><td colspan="2"><strong>TOTAL (TOP 20)</strong></td><td class="text-right"><strong>${formatNumber(totalUnidades)}</strong></td><td></td><td class="text-right"><strong>${totalCx.toFixed(1).replace('.',',')}</strong></td><td class="text-right"><strong>${totalPercent.toFixed(2).replace('.', ',')}%</strong></td><td colspan="2"></td></tr></tfoot></table></div>`;
+            
+            top20Container.innerHTML += `<button class="copy-image-btn" data-target="#product-top20-geral-table-wrapper" data-filename="top_20_skus_geral.png"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/></svg>Copiar como Imagem</button>
+            <div class="table-responsive-wrapper" id="product-top20-geral-table-wrapper">
+                <table id="product-top20-geral-table">
+                    <thead><tr><th>Código</th><th>SKUS</th><th class="text-right">Unidades</th><th class="text-right">QMS</th><th class="text-right">CX</th><th class="text-right">%</th><th>Setor</th><th>Posição</th></tr></thead>
+                    <tbody>${tableRows}</tbody>
+                    <tfoot><tr><td colspan="2"><strong>TOTAL (TOP 20)</strong></td><td class="text-right"><strong>${formatNumber(totalUnidades)}</strong></td><td></td><td class="text-right"><strong>${totalCx.toFixed(1).replace('.',',')}</strong></td><td class="text-right"><strong>${totalPercent.toFixed(2).replace('.', ',')}%</strong></td><td colspan="2"></td></tr></tfoot>
+                </table>
+            </div>`;
         }
         
         function displayTop20BySector(productsBySector) {
             const container = document.getElementById('product-top20-setor-container');
             if (Object.keys(productsBySector).length === 0) { container.innerHTML = ``; return; }
+            
             container.innerHTML = `<h2>Top 30 Saídas por Setor</h2><div class="search-container"><input type="text" id="sectorSearchInput" placeholder="Pesquisar por setor..."></div>`;
             const sortedSectors = Object.keys(productsBySector).sort((a,b) => getOrder(a) - getOrder(b));
             const grid = document.createElement('div');
             grid.className = 'sector-detail-grid';
+            
             sortedSectors.forEach((setor, index) => {
                 const products = productsBySector[setor];
                 const totalUnidadesSetor = products.reduce((sum, item) => sum + item.unidades, 0);
@@ -1031,6 +1099,7 @@
                 grid.appendChild(card);
             });
             container.appendChild(grid);
+            
             document.getElementById('sectorSearchInput').addEventListener('input', (e) => {
                 const searchTerm = e.target.value.toLowerCase();
                 grid.querySelectorAll('.sector-detail-card').forEach(card => {
@@ -1129,10 +1198,7 @@
                             const nomeLoja = storeInfo ? storeInfo.name : (String(row['Nome da Loja'] || '').trim() || 'N/A');
                             const filialKey = `${codigoLoja} - ${nomeLoja}`;
                             let rota = String(row['Rota'] || 'N/A').trim();
-                            
-                            // Melhoria Rota
                             if(storeInfo && (rota === '916' || rota === 'N/A' || rota === '')) rota = storeInfo.rota;
-                            
                             const qty = parseFloat(row['Qtd'] || row['Sum Qtd Solicitada'] || row['Tot'] || 0);
                             if(!acc[filialKey]) acc[filialKey] = { rota: rota, qtd: 0 };
                             acc[filialKey].qtd += qty;
@@ -1158,10 +1224,7 @@
                             const nomeLoja = storeInfo ? storeInfo.name : (String(row['Nome da Loja'] || '').trim() || 'N/A');
                             const filialKey = `${codigoLoja} - ${nomeLoja}`;
                             let rota = String(row['Rota'] || 'N/A').trim();
-                            
-                            // Melhoria Rota
                             if(storeInfo && (rota === '916' || rota === 'N/A' || rota === '')) rota = storeInfo.rota;
-                            
                             const qty = parseFloat(row['Qtd'] || row['Sum Qtd Solicitada'] || row['Tot'] || 0);
                             if(!acc[filialKey]) acc[filialKey] = { rota: rota, qtd: 0 };
                             acc[filialKey].qtd += qty;
@@ -1192,10 +1255,7 @@
                 const nomeLoja = storeInfo ? storeInfo.name : (String(row['Nome da Loja'] || '').trim() || 'N/A');
                 const filialKey = `${codigoLoja} - ${nomeLoja}`;
                 let rota = String(row['Rota'] || 'N/A').trim();
-                
-                // Melhoria Rota
                 if(storeInfo && (rota === '916' || rota === 'N/A' || rota === '')) rota = storeInfo.rota;
-                
                 const qty = parseFloat(row['Qtd'] || row['Sum Qtd Solicitada'] || row['Tot'] || 0);
                 if(!acc[filialKey]) acc[filialKey] = { rota: rota, qtd: 0 };
                 acc[filialKey].qtd += qty;
@@ -1247,7 +1307,7 @@
             };
         }
 
-        // ==========================================================
+        //        // ==========================================================
         // === 5. FUNÇÕES DE EXPORTAÇÃO E IMPORTAÇÃO ===
         // ==========================================================
         async function saveAnalysisToFirebase() {
@@ -1309,6 +1369,7 @@
                     for (const [setor, data] of setoresData.entries()) {
                         const docData = {
                             totalQtd: data.totalQtd,
+                            totalQmsCx: data.totalQmsCx, // ATUALIZADO: Enviando o valor QMS
                             totalLabels: data.totalLabels,
                             labelsByRoute: Object.fromEntries(data.labelsByRoute),
                             productCount: data.products.size
@@ -1358,7 +1419,6 @@
             if (lastId) {
                 const modal = document.getElementById('update-share-modal');
                 modal.classList.remove('hidden');
-                // Adicionado listener para fechar o modal
                 modal.querySelector('.modal-close-btn').onclick = () => modal.classList.add('hidden');
                 modal.onclick = (e) => { if (e.target === modal) modal.classList.add('hidden'); };
 
@@ -1386,6 +1446,7 @@
                 const filialDetailsRef = collection(db, "shared_analyses", analysisId, "filial_details");
                 const dataChunksRef = collection(db, "shared_analyses", analysisId, "data_chunks");
                 const [sectorSnapshot, filialSnapshot, dataSnapshot] = await Promise.all([ getDocs(sectorDetailsRef), getDocs(filialDetailsRef), getDocs(dataChunksRef) ]);
+                
                 const setoresData = new Map();
                 sectorSnapshot.forEach(doc => {
                     const setor = doc.id.replace(/_/g, '/');
@@ -1393,11 +1454,13 @@
                     const labelsByRoute = new Map(Object.entries(data.labelsByRoute || {}));
                     setoresData.set(setor, {
                         totalQtd: data.totalQtd,
+                        totalQmsCx: data.totalQmsCx || 0, // ATUALIZADO: Lendo o valor QMS
                         products: new Map(),
                         totalLabels: data.totalLabels,
                         labelsByRoute: labelsByRoute
                     });
                 });
+                
                 const filialData = new Map();
                 filialSnapshot.forEach(doc => {
                     const rota = doc.id.replace(/_/g, '/');
@@ -1408,11 +1471,13 @@
                         data.filiais.forEach(filialInfo => filiaisMap.set(filialInfo.filial, filialInfo.unidades));
                     }
                 });
+                
                 let allAnalysisData = [];
                 if (!dataSnapshot.empty) {
                     const sortedChunks = dataSnapshot.docs.map(doc => doc.data()).sort((a, b) => a.chunkIndex - b.chunkIndex);
                     sortedChunks.forEach(chunk => allAnalysisData = allAnalysisData.concat(chunk.data));
                 }
+                
                 allAnalysisData.forEach(item => {
                     const setor = item.setor;
                     if (setor && setoresData.has(setor)) {
@@ -1422,10 +1487,12 @@
                         setorInfo.products.set(item.codigo, productInfo);
                     }
                 });
+                
                 const sectorAnalysis = { setoresData, filialData, totalQuantidadeGeral: manifestData.totalQuantidadeGeral, totalSkusGeral: manifestData.totalSkusGeral, totalUniqueFiliais: manifestData.totalUniqueFiliais, filiaisSemFaturamento: manifestData.filiaisSemFaturamento || [] };
                 const productAnalysis = { analysisData: allAnalysisData, productSalesDetails: new Map() };
                 appState.processedData.sectorAnalysis = sectorAnalysis;
                 appState.processedData.productAnalysis = productAnalysis;
+                
                 UIElements.containers.initialPlaceholder.classList.add('hidden');
                 UIElements.containers.fullAnalysis.classList.remove('hidden');
                 document.getElementById('file-control-panel').classList.add('hidden');
@@ -1436,7 +1503,9 @@
                 UIElements.sections.filial.classList.remove('hidden');
                 UIElements.sections.noBilling.classList.remove('hidden');
                 UIElements.sections.product.classList.remove('hidden');
+                
                 UIElements.containers.sectorSummary.innerHTML = `<div class="geral-summary-grid"><div class="geral-summary-card"><div class="icon sector"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg></div><div class="info"><p>Quantidade Total</p><div class="value">${formatNumber(sectorAnalysis.totalQuantidadeGeral)}</div></div></div><div class="geral-summary-card"><div class="icon skus"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4"/><path d="M12 20v2"/><path d="M5 12H3"/><path d="M21 12h-2"/><path d="m18.36 5.64-.18-.18"/><path d="m5.82 18.18-.18-.18"/><path d="m18.18 18.18-.18.18"/><path d="m5.64 5.64-.18.18"/></svg></div><div class="info"><p>Total de SKUs Analisados</p><div class="value">${formatNumber(sectorAnalysis.totalSkusGeral)}</div></div></div></div>`;
+                
                 displaySectorResults(sectorAnalysis);
                 displayProductAnalysisResults(productAnalysis.analysisData);
                 const productsBySector = productAnalysis.analysisData.reduce((acc, product) => {
@@ -1447,6 +1516,7 @@
                 }, {});
                 displayTop20BySector(productsBySector);
                 setupProductSearch(productAnalysis.analysisData, productAnalysis.productSalesDetails);
+                
                 showNotification('Análise partilhada carregada.', 'success');
                 if (manifestData.lastUpdateTime) updateTimestamp(manifestData.lastUpdateTime);
             } catch (error) {
@@ -1516,7 +1586,7 @@
             }
         }
 
-        // ==========================================================
+        //        // ==========================================================
         // === 6. EVENT LISTENERS E INICIALIZAÇÃO ===
         // ==========================================================
         function initializeEventListeners() {
@@ -1524,17 +1594,21 @@
                 UIElements.fileControl.panel.classList.toggle('open');
                 UIElements.fileControl.icon.textContent = UIElements.fileControl.panel.classList.contains('open') ? '▲' : '▼';
             });
+            
             Object.keys(UIElements.dropAreas).forEach(key => setupFileDropArea(UIElements.dropAreas[key], UIElements.inputs[key]));
+            
             UIElements.inputs.orders.addEventListener('change', handleOrdersFile);
             UIElements.inputs.status.addEventListener('change', handleStatusFile);
             UIElements.inputs.sector.addEventListener('change', handleSectorFile);
             UIElements.inputs.address.addEventListener('change', handleAddressFile);
             UIElements.inputs.productMaster.addEventListener('change', handleProductMasterFile);
             UIElements.inputs.sharedFile.addEventListener('change', handleSharedFile);
+            
             UIElements.buttons.reloadFiles.addEventListener('click', () => {
                 Object.keys(localStorage).forEach(key => localStorage.removeItem(key));
                 window.location.href = window.location.href.split('?')[0];
             });
+            
             if (UIElements.buttons.shareOnline) { UIElements.buttons.shareOnline.addEventListener('click', saveAnalysisToFirebase); }
             
             document.body.addEventListener('click', e => {
@@ -1544,16 +1618,20 @@
                     const filename = copyImageButton.dataset.filename || 'relatorio.png';
                     const elementToCopy = document.querySelector(targetSelector);
                     if (!elementToCopy) { showNotification('Erro: Elemento do relatório não encontrado.', 'error'); return; }
+                    
                     const tableToCopy = elementToCopy.querySelector('table');
                     const finalElementToCapture = tableToCopy || elementToCopy;
+                    
                     copyImageButton.style.visibility = 'hidden';
                     const otherButtons = elementToCopy.querySelectorAll('.export-btn');
                     otherButtons.forEach(btn => btn.style.visibility = 'hidden');
                     showNotification('A gerar imagem...', 'warning', 2000);
+                    
                     const originalMaxHeight = elementToCopy.style.maxHeight;
                     const originalOverflow = elementToCopy.style.overflow;
                     elementToCopy.style.maxHeight = 'none';
                     elementToCopy.style.overflow = 'visible';
+                    
                     setTimeout(() => {
                         html2canvas(finalElementToCapture, { scale: 2, backgroundColor: '#ffffff', useCORS: true })
                         .then(canvas => {
@@ -1573,21 +1651,25 @@
                         });
                     }, 100);
                 }
+                
                 const exportSectorPdfButton = e.target.closest('.export-sector-pdf-btn');
                 if (exportSectorPdfButton) {
                     const sector = exportSectorPdfButton.dataset.sector;
                     if (!sector || !appState.processedData.productAnalysis) return;
                     const allSectorProducts = appState.processedData.productAnalysis.analysisData.filter(p => p.setor === sector);
                     if (allSectorProducts.length === 0) { showNotification(`Nenhum produto encontrado para o setor ${sector}.`, 'warning'); return; }
+                    
                     const totalUnidadesSetor = allSectorProducts.reduce((sum, item) => sum + item.unidades, 0);
                     const top30SectorProducts = allSectorProducts.sort((a, b) => b.unidades - a.unidades).slice(0, 30);
                     const faturamentoTotalDia = appState.processedData.sectorAnalysis.totalQuantidadeGeral;
                     const setorInfo = appState.processedData.sectorAnalysis.setoresData.get(sector);
                     const totalEtiquetasSetor = setorInfo ? setorInfo.totalLabels : 0;
+                    
                     let subtitle = `Faturamento Total do Dia: ${formatNumber(faturamentoTotalDia)} unid. | Faturamento do Setor: ${formatNumber(totalUnidadesSetor)} unid.`;
                     if (labelSectors.has(sector.toUpperCase()) && totalEtiquetasSetor > 0) {
                         subtitle += ` | Total de Etiquetas: ${formatNumber(totalEtiquetasSetor)}`;
                     }
+                    
                     const title = `Relatório de Saídas - Setor: ${sector}`;
                     const head = ['Código', 'SKU', 'Endereço', 'Unidades', '% Setor'];
                     const body = top30SectorProducts.map(item => [
@@ -1597,10 +1679,12 @@
                         formatNumber(item.unidades),
                         `${totalUnidadesSetor > 0 ? ((item.unidades / totalUnidadesSetor) * 100).toFixed(1).replace('.',',') : '0,0'}%`
                     ]);
+                    
                     const filename = `Relatorio_Saidas_Top30_${sector.replace(/\s/g, '_')}.pdf`;
                     exportToPdf(title, subtitle, head, body, filename);
                 }
             });
+            
             if (UIElements.buttons.exportData) {
                 UIElements.buttons.exportData.addEventListener('click', () => {
                     const dataToShare = { ordersData: appState.ordersData, nonReturnedOrders: Array.from(appState.nonReturnedOrders), sectorData: appState.sectorData, addressData: Array.from(appState.addressData.entries()), productMasterData: Array.from(appState.productMasterData.entries()), lastUpdateTime: localStorage.getItem('lastUpdateTime') };
@@ -1614,28 +1698,33 @@
                     showNotification('Ficheiro de partilha (.json) descarregado!', 'success');
                 });
             }
+            
             if (UIElements.buttons.dailyReport) {
                 UIElements.buttons.dailyReport.addEventListener('click', () => {
                     if (!appState.processedData.sectorAnalysis || !appState.processedData.productAnalysis) { showNotification('Carregue as planilhas de Itens e Endereços para gerar o relatório.', 'error'); return; }
                     showNotification('A gerar relatório diário...', 'warning', 2000);
+                    
                     const sheets = [];
                     const { filialData } = appState.processedData.sectorAnalysis;
                     const faturamentoPorRota = new Map();
                     for (const [rota, filiais] of filialData.entries()) faturamentoPorRota.set(rota, [...filiais.values()].reduce((a, b) => a + b, 0));
                     const rotaData = Array.from(faturamentoPorRota.entries()).map(([rota, unidades]) => ({'Rota': rota, 'Total Unidades': unidades})).sort((a,b) => Number(a.Rota) - Number(b.Rota));
                     if(rotaData.length > 0) sheets.push({ name: 'Faturamento por Rota', data: rotaData });
+                    
                     const { setoresData } = appState.processedData.sectorAnalysis;
                     const setorData = [...setoresData.entries()].map(([setor, data]) => ({'Setor': setor, 'Total Unidades': data.totalQtd, 'Total SKUs': data.products.size})).sort((a,b) => getOrder(a.Setor) - getOrder(b.Setor));
                     if(setorData.length > 0) sheets.push({ name: 'Faturamento por Setor', data: setorData });
+                    
                     const { analysisData } = appState.processedData.productAnalysis;
                     const top50SKUs = analysisData.slice(0, 50).map(item => ({ 'Código': item.codigo, 'SKU': item.skus, 'Unidades': item.unidades, 'Caixas (QMS)': parseFloat(item.cx.toFixed(2)), 'Setor': item.setor, 'Posição': item.posicao }));
                     if(top50SKUs.length > 0) sheets.push({ name: 'Top 50 SKUs', data: top50SKUs });
+                    
                     const today = new Date().toISOString().slice(0, 10);
                     exportToExcel(sheets, `Relatorio_Diario_${today}.xlsx`);
                 });
             }
         }
-        
+
         function handleOrdersFile(event) {
             processUploadedFile(event.target.files[0], (data) => {
                 appState.ordersData = data;
@@ -1777,12 +1866,14 @@
             const productMasterDataArray = JSON.parse(localStorage.getItem('productMasterData'));
             const savedTimestamp = localStorage.getItem('lastUpdateTime');
             let dataLoaded = false;
+            
             if (ordersData) { appState.ordersData = ordersData; UIElements.dropAreas.orders.classList.add('loaded'); dataLoaded = true; }
             if (nonReturnedOrdersArray) { appState.nonReturnedOrders = new Set(nonReturnedOrdersArray); UIElements.dropAreas.status.classList.add('loaded'); dataLoaded = true; }
             if (sectorData) { appState.sectorData = sectorData; UIElements.dropAreas.sector.classList.add('loaded'); dataLoaded = true; }
             if (addressDataArray) { appState.addressData = new Map(addressDataArray); UIElements.dropAreas.address.classList.add('loaded'); dataLoaded = true; }
             if (productMasterDataArray) { appState.productMasterData = new Map(productMasterDataArray); UIElements.dropAreas.productMaster.classList.add('loaded'); dataLoaded = true; }
             if (savedTimestamp) updateTimestamp(savedTimestamp);
+            
             if (dataLoaded) {
                 showNotification('Dados da sessão anterior carregados.', 'success');
                 UIElements.containers.actions.classList.remove('hidden');
@@ -1791,7 +1882,7 @@
             }
         }
 
-        // ==========================================================
+        //        // ==========================================================
         // === 7. INICIALIZAÇÃO DA APLICAÇÃO ===
         // ==========================================================
         document.addEventListener('DOMContentLoaded', () => {
